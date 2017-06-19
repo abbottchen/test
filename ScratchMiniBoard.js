@@ -31,7 +31,6 @@
     
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
-	 console.log('FrameStep: ' + FrameStep);
 	 if(FrameStep>280)
 		FrameStep=0; 
 	//等待接收帧头    
@@ -54,10 +53,14 @@
 	}
 	else if(FrameStep==(2+DataLen)){
 		FrameBuf[FrameStep]=ch;
+		
 		var Sum=0;
 		for(var i=0;i<(2+DataLen);i++){	
 			Sum=Sum+FrameBuf[i];
 		}
+		Sum=Sum%256;
+		console.log('Sum: ' + Sum);
+		console.log('ch: ' + ch);
 		if(ch!=Sum)
 		{
 			FrameStep=0;
@@ -99,7 +102,7 @@
         device.set_receive_handler(function(data) {
 	    clearTimeout(watchdog); 
             watchdog = null;
-            console.log('Received: ' + data.byteLength);
+            console.log('Received: ' + rawData);
 	    var rawData = new Uint8Array(data);	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
