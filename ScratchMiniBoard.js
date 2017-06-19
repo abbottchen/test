@@ -36,7 +36,8 @@
     
     function GetFrameFromLoopBuf() {
         var RevDataCount=0;
-	inputs['D1']=22;    
+	inputs['D1']=22;
+	inputs['D6']=inputs['D6']+1;    
         while (true)//获取正确的合法帧
 	{
 			inputs['D1']=25;
