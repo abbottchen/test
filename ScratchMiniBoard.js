@@ -38,7 +38,6 @@
 		if(ch==0xaa){
 			FrameStep=1;
 			FrameBuf[0]=ch;
-			console.log('GetFrame Head OK: ' + FrameBuf);
 		}
 	}
 	//接收数据长度
@@ -102,12 +101,12 @@
         device.set_receive_handler(function(data) {
 	    clearTimeout(watchdog); 
             watchdog = null;
-            console.log('Received: ' + rawData);
 	    var rawData = new Uint8Array(data);	
+	    console.log('Received: ' + rawData);	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-		console.log('Received Data[]:' +i+':'+ rawData[i]);
+		//console.log('Received Data[]:' +i+':'+ rawData[i]);
 		GetFrame(rawData[i]);  
             }
         });
