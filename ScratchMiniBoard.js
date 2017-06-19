@@ -139,7 +139,9 @@
 
             if(rawData.byteLength >= 18) {
                 console.log(rawData);
-                processData();
+                clearTimeout(watchdog);
+                watchdog = null;
+                //processData();
                 //device.send(pingCmd.buffer);
             }
         });
