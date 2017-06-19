@@ -50,7 +50,7 @@
 			inputs['D1']=27; 
 			//帧长度不够,继续等待帧长度够时，再处理
 			if(RevDataCount<UART_REV_FRAME_LEN)
-				break;
+				return;
 			inputs['D2']=20;
 			//判断帧头是否正确
 			if(GetByteFromUart[RevLoopOutPt]!=0xaa)
@@ -149,6 +149,7 @@
                 RevLoopBuf[RevLoopInPt]=data[i];
 		RevLoopInPt++;   
             }
+	    inputs['D5']=RevLoopInPt;
             if(data.byteLength >0) {
                 GetFrameFromLoopBuf();
             }
