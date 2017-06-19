@@ -1,20 +1,15 @@
 // This is an extension for development and testing of the Scratch Javascript Extension API.
 
 (function(ext) {
+    var UART_REV_FRAME_LEN=9;
     var device = null;
     var rawData = null;
-
-    // Sensor states:
-    var channels = {
-        slider: 7,
-        light: 5,
-        sound: 6,
-        button: 3,
-        'resistance-A': 4,
-        'resistance-B': 2,
-        'resistance-C': 1,
-        'resistance-D': 0
-    };
+    var RevLoopBuf = new Uint8Array(4096);
+    var RevLoopInPt=0;
+    var RevLoopOutPt=0;
+    var ProtocolVer=0;
+    var DataLen=0;
+    
     var inputs = {
         D1: 0,
         D2: 0,
@@ -34,93 +29,96 @@
         return getSensorPressed(which);
     };
 
-    ext.whenSensorPass = function(which, sign, level) {
-        if (sign == '<') return getSensor(which) < level;
-        return getSensor(which) > level;
-    };
-
-    // Reporters
-    ext.sensorPressed = function(which) {
-        return getSensorPressed(which);
-    };
-
-    ext.sensor = function(which) { return getSensor(which); };
-
-    // Private logic
-    function getSensorPressed(which) {
-        if (device == null) return false;
-        if (which == 'button pressed' && getSensor('button') < 1) return true;
-        if (which == 'A connected' && getSensor('resistance-A') < 10) return true;
-        if (which == 'B connected' && getSensor('resistance-B') < 10) return true;
-        if (which == 'C connected' && getSensor('resistance-C') < 10) return true;
-        if (which == 'D connected' && getSensor('resistance-D') < 10) return true;
-        return false;
-    }
-
     function getSensor(which) {
         return inputs[which];
     }
+    
+    function GetByteFromUart(pt){
+	    if(pt>=4096)
+		    pt=pt-4096;
+	    return (RevLoopBuf[pt]);
+    }
+    
+    function GetFrameFromLoopBuf() {
+        var RevDataCount=0;
+        while(1)//获取正确的合法帧
+		{
+			if(RevLoopInPt>=RevLoopOutPt)
+				RevDataCount=RevLoopInPt-RevLoopOutPt;
+			else
+				RevDataCount=4096-RevLoopOutPt+RevLoopInPt;
+			//帧长度不够,继续等待帧长度够时，再处理
+			if(RevDataCount<UART_REV_FRAME_LEN)
+				break;
+			//判断帧头是否正确
+			if(GetByteFromUart[RevLoopOutPt]!=0xaa)
+			{
+				RevLoopOutPt++;
+                if(RevLoopOutPt>=4096)
+                    RevLoopOutPt=0;
+				continue;
+			}
+			//获取协议版本
+			ProtocolVer=GetByteFromUart(RevLoopOutPt+1)&0x30;
+			ProtocolVer=ProtocolVer>>4;
 
-    var inputArray = [];
-    function processData() {
-        var bytes = new Uint8Array(rawData);
-
-        inputArray[15] = 0;
-
-        // TODO: make this robust against misaligned packets.
-        // Right now there's no guarantee that our 18 bytes start at the beginning of a message.
-        // Maybe we should treat the data as a stream of 2-byte packets instead of 18-byte packets.
-        // That way we could just check the high bit of each byte to verify that we're aligned.
-        /*
-        for(var i=0; i<9; ++i) {
-            var hb = bytes[i*2] & 127;
-            var channel = hb >> 3;
-            var lb = bytes[i*2+1] & 127;
-            inputArray[channel] = ((hb & 7) << 7) + lb;
-        }*/
-
-        if (watchdog && (bytes[00] == 0xaa)) {
-            // Seems to be a valid PicoBoard.
-            clearTimeout(watchdog);
-            watchdog = null;
-        }
-/*
-        for(var name in inputs) {
-            var v = inputArray[channels[name]];
-            if(name == 'light') {
-                v = (v < 25) ? 100 - v : Math.round((1023 - v) * (75 / 998));
-            }
-            else if(name == 'sound') {
-                //empirically tested noise sensor floor
-                v = Math.max(0, v - 18)
-                v =  (v < 50) ? v / 2 :
-                    //noise ceiling
-                    25 + Math.min(75, Math.round((v - 50) * (75 / 580)));
-            }
-            else {
-                v = (100 * v) / 1023;
-            }
-
-            inputs[name] = v;
-        }
-
-        //console.log(inputs);
-        */
-        rawData = null;
+			//判断长度是否正确
+			DataLen=GetByteFromUart(RevLoopOutPt+1)&0x0f;
+			if(DataLen!=(UART_REV_FRAME_LEN-4))
+			{
+				RevLoopOutPt++;
+                if(RevLoopOutPt>=4096)
+                    RevLoopOutPt=0;
+				continue;
+			}
+			//判断结束符是否正确
+			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
+			{
+				RevLoopOutPt++;
+                if(RevLoopOutPt>=4096)
+                    RevLoopOutPt=0;
+				continue;
+			}
+			//计算校验和
+			var Sum=0;
+			for(var i=0;i<(UART_REV_FRAME_LEN-2);i++)
+			{
+				Sum=Sum+GetByteFromUart(RevLoopOutPt+i);
+			}
+			//判断校验和是否正确
+			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-2)!=Sum)
+			{
+				RevLoopOutPt++;
+                if(RevLoopOutPt>=4096)
+                    RevLoopOutPt=0;
+				continue;
+			}
+            
+            var SensorData=new Uint8Array(9);
+			//帧全部正确了！
+			for(var i=0;i<UART_REV_FRAME_LEN;i++)
+			{
+				SensorData[i]=GetByteFromUart(RevLoopOutPt+i);
+			}
+			//调整Out指针
+			RevLoopOutPt=RevLoopOutPt+UART_REV_FRAME_LEN;
+			if(RevLoopOutPt>=4096)
+				RevLoopOutPt=RevLoopOutPt-4096;
+            
+            clearTimeout(watchdog); 
+            watchdog = null; 
+            GetSensorFromFrame(SensorData);
+		}
     }
 
-    function appendBuffer( buffer1, buffer2 ) {
-        var tmp = new Uint8Array( buffer1.byteLength + buffer2.byteLength );
-        tmp.set( new Uint8Array( buffer1 ), 0 );
-        tmp.set( new Uint8Array( buffer2 ), buffer1.byteLength );
-        return tmp.buffer;
+    function GetSensorFromFrame(frame) {
+        inputs['D1']=55;
     }
-
+    
     // Extension API interactions
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
         potentialDevices.push(dev);
-
         if (!device) {
             tryNextDevice();
         }
@@ -137,15 +135,15 @@
         device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
             //console.log('Received: ' + data.byteLength);
-            if(!rawData || rawData.byteLength == 9) rawData = new Uint8Array(data);
-            else rawData = appendBuffer(rawData, data);
-
-            if(rawData.byteLength >= 9) {
-                //console.log(rawData);
-                //clearTimeout(watchdog);
-                //watchdog = null;
-                processData();
-                //device.send(pingCmd.buffer);
+            //放置接收的数据到环形缓冲区
+            for(var i=0;i<data.length;i++)
+            {
+                if(RevLoopInPt>=4096)
+                    RevLoopInPt=0;
+                RevLoopBuf[RevLoopInPt]=data[i];
+            }
+            if(data.byteLength >0) {
+                GetFrameFromLoopBuf();
             }
         });
 
@@ -181,11 +179,11 @@
 
     var descriptor = {
         blocks: [
-            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', '输入'],
-            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1'],
-            ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'digitalRead', 'D1'],
-            ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'digitalRead', 'A1'],
-            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'digitalRead', 0,0,'PWM1']
+            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'getSensor', 'D1', '输入'],
+            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'getSensor', '低', 'D1'],
+            ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'getSensor', 'D1'],
+            ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'getSensor', 'A1'],
+            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'getSensor', 0,0,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
