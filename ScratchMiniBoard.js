@@ -58,7 +58,7 @@
                     			RevLoopOutPt=0;
 				continue;
 			}
-			inputs['D1']=33;	
+			inputs['D3']=33;	
 			//获取协议版本
 			ProtocolVer=GetByteFromUart(RevLoopOutPt+1)&0x30;
 			ProtocolVer=ProtocolVer>>4;
@@ -72,7 +72,7 @@
                    		 RevLoopOutPt=0;
 				continue;
 			}
-			inputs['D1']=44;
+			inputs['D3']=44;
 			//判断结束符是否正确
 			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
 			{
@@ -81,7 +81,7 @@
                    		 RevLoopOutPt=0;
 				continue;
 			}
-			inputs['D1']=55;
+			inputs['D3']=55;
 			//计算校验和
 			var Sum=0;
 			for(var i=0;i<(UART_REV_FRAME_LEN-2);i++)
@@ -96,7 +96,7 @@
                     		RevLoopOutPt=0;
 				continue;
 			}
-            		inputs['D1']=66;
+            		inputs['D3']=66;
             		var SensorData=new Uint8Array(9);
 			//帧全部正确了！
 			for(var i=0;i<UART_REV_FRAME_LEN;i++)
@@ -107,7 +107,7 @@
 			RevLoopOutPt=RevLoopOutPt+UART_REV_FRAME_LEN;
 			if(RevLoopOutPt>=4096)
 				RevLoopOutPt=RevLoopOutPt-4096;
-            		inputs['D1']=77;
+            		inputs['D3']=77;
             		clearTimeout(watchdog); 
             		watchdog = null; 
             		GetSensorFromFrame(SensorData);
@@ -115,7 +115,7 @@
     }
 
     function GetSensorFromFrame(frame) {
-        inputs['D1']=99;
+        inputs['D3']=99;
     }
     
     // Extension API interactions
