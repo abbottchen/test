@@ -23,9 +23,7 @@
     };
 
     function getSensor(which) {
-        //return inputs[which];
-	    
-	return 66;
+        return inputs[which];
     }
     
     function GetByteFromUart(pt){
