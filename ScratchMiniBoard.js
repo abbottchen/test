@@ -175,5 +175,5 @@
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
-    ScratchExtensions.register('ScratchMiniBoard', descriptor, ext, {type: 'serial'});
+    ScratchExtensions.register('Scratch Mini Board', descriptor, ext, {type: 'serial'});
 })({});
