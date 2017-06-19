@@ -1,7 +1,3 @@
-// picoExtension.js
-// Shane M. Clements, February 2014
-// PicoBoard Scratch Extension
-//
 // This is an extension for development and testing of the Scratch Javascript Extension API.
 
 (function(ext) {
@@ -198,5 +194,5 @@
         },
         url: '/info/help/studio/tips/ext/PicoBoard/'
     };
-    ScratchExtensions.register('Scratch Mini Board', descriptor, ext, {type: 'serial'});
+    ScratchExtensions.register('ScratchMiniBoard', descriptor, ext, {type: 'serial'});
 })({});
