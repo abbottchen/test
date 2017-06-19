@@ -145,6 +145,7 @@
                 if(RevLoopInPt>=4096)
                     RevLoopInPt=0;
                 RevLoopBuf[RevLoopInPt]=data[i];
+		RevLoopInPt++;   
             }
             if(data.byteLength >0) {
                 GetFrameFromLoopBuf();
