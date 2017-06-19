@@ -72,7 +72,7 @@
 	}
 	else if(FrameStep==(3+DataLen)){   
 	    	if(ch==0x16){
-			
+			console.log('Frame is Ok');
 	    	}
 	        else{
 			FrameStep=0;
@@ -102,11 +102,11 @@
 	    clearTimeout(watchdog); 
             watchdog = null;
 	    var rawData = new Uint8Array(data);	
-	    console.log('Received: ' + rawData);	
+	    console.log('Received size' + data.byteLength);	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-		//console.log('Received Data[]:' +i+':'+ rawData[i]);
+		console.log(rawData[i]);
 		GetFrame(rawData[i]);  
             }
         });
