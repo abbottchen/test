@@ -133,7 +133,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 1000);
+        }, 500);
     };
 	
     ext.resetAll = function(){};	
