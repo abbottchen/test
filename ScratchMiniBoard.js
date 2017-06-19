@@ -22,6 +22,8 @@
         'A3': 9
     };
 
+    inputs['D1']=2;
+	
     function getSensor(which) {
         return inputs[which];
     }
