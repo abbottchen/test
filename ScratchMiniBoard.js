@@ -1,329 +1,202 @@
-/*This program is free software: you can redistribute it and/or modify
- *it under the terms of the GNU General Public License as published by
- *the Free Software Foundation, either version 3 of the License, or
- *(at your option) any later version.
- *
- *This program is distributed in the hope that it will be useful,
- *but WITHOUT ANY WARRANTY; without even the implied warranty of
- *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *GNU General Public License for more details.
- *
- *You should have received a copy of the GNU General Public License
- *along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// picoExtension.js
+// Shane M. Clements, February 2014
+// PicoBoard Scratch Extension
+//
+// This is an extension for development and testing of the Scratch Javascript Extension API.
 
 (function(ext) {
+    var device = null;
+    var rawData = null;
 
-  var potentialDevices = [];
-  var watchdog = null;
-  var poller = null;
-  var lastReadTime = 0;
-  var connected = false;
-  var command = null;
-  var parsingCmd = false;
-  var bytesRead = 0;
-  var waitForData = 0;
-  var storedInputData = new Uint8Array(4096);
+    // Sensor states:
+    var channels = {
+        slider: 7,
+        light: 5,
+        sound: 6,
+        button: 3,
+        'resistance-A': 4,
+        'resistance-B': 2,
+        'resistance-C': 1,
+        'resistance-D': 0
+    };
+    var inputs = {
+        slider: 0,
+        light: 0,
+        sound: 0,
+        button: 0,
+        'resistance-A': 0,
+        'resistance-B': 0,
+        'resistance-C': 0,
+        'resistance-D': 0
+    };
 
-  var CMD_DIGITAL_WRITE = 0x73,
-    CMD_ANALOG_WRITE = 0x74,
-    CMD_PIN_MODE = 0x75,
-    CMD_CALIBRATE_IMU = 0x76,
-    CMD_SERVO_WRITE = 0x77,
-    CMD_ANALOG_READ = 0x78,
-    CMD_DIGITAL_READ = 0x79,
-    CMD_IMU_READ = 0x7A,
-    CMD_IMU_EVENT = 0x7B,
-    CMD_PING = 0x7C,
-    CMD_PING_CONFIRM = 0x7D;
+    ext.resetAll = function(){};
 
-  var IMU_EVENT_TAP = 0x00,
-    IMU_EVENT_DOUBLE_TAP = 0x01,
-    IMU_EVENT_SHAKE = 0x02;
+    // Hats / triggers
+    ext.whenSensorConnected = function(which) {
+        return getSensorPressed(which);
+    };
 
-  var PWM_PINS = [3, 5, 6, 9];
-    DIGITAL_PINS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-    ANALOG_PINS = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5'];
+    ext.whenSensorPass = function(which, sign, level) {
+        if (sign == '<') return getSensor(which) < level;
+        return getSensor(which) > level;
+    };
 
-  var LOW = 0,
-    HIGH = 1;
+    // Reporters
+    ext.sensorPressed = function(which) {
+        return getSensorPressed(which);
+    };
 
-  var INPUT = 0,
-    OUTPUT = 1;
+    ext.sensor = function(which) { return getSensor(which); };
 
-  var digitalInputData = new Uint8Array(12),
-    pinModes = new Uint8Array(12),
-    analogInputData = new Uint8Array(6),
-    accelInputData = [0,0],
-    imuEventData = new Uint8Array(3),
-    servoVals = new Uint8Array(12);
-
-  var device = null;
-
-  function analogRead(aPin) {
-    var pin = -1;
-    if (isNaN(parseFloat(aPin)))
-      pin = ANALOG_PINS.indexOf(aPin.toUpperCase());
-    else if (ANALOG_PINS[aPin])
-      pin = aPin;
-    if (pin === -1) return;
-    return Math.round(map(analogInputData[pin], 0, 255, 0, 100));
-  }
-
-  function digitalRead(pin) {
-    if (DIGITAL_PINS.indexOf(parseInt(pin)) === -1) return;
-    if (pinModes[pin-2] != INPUT)
-      pinMode(pin, INPUT);
-    return digitalInputData[parseInt(pin)-2];
-  }
-
-  function analogWrite(pin, val) {
-    if (PWM_PINS.indexOf(parseInt(pin)) === -1) return;
-    if (val < 0) val = 0;
-    else if (val > 100) val = 100;
-    val = Math.round((val / 100) * 255);
-    device.send(new Uint8Array([CMD_ANALOG_WRITE, pin, val]).buffer);
-  }
-
-  function digitalWrite(pin, val) {
-    if (DIGITAL_PINS.indexOf(parseInt(pin)) === -1) return;
-    device.send(new Uint8Array([CMD_DIGITAL_WRITE, pin, val]).buffer);
-  }
-
-  function pinMode(pin, mode) {
-    device.send(new Uint8Array([CMD_PIN_MODE, pin, mode]).buffer);
-  }
-
-  function rotateServo(pin, deg) {
-    if (DIGITAL_PINS.indexOf(parseInt(pin)) === -1) return;
-    device.send(new Uint8Array([CMD_SERVO_WRITE, pin, deg]).buffer);
-    servoVals[pin] = deg;
-  }
-
-  function map(val, aMin, aMax, bMin, bMax) {
-    if (val > aMax) val = aMax;
-    else if (val < aMin) val = aMin;
-    return (((bMax - bMin) * (val - aMin)) / (aMax - aMin)) + bMin;
-  }
-
-  function tryNextDevice() {
-    device = potentialDevices.shift();
-    if (!device) return;
-    device.open({stopBits: 0, bitRate: 57600, ctsFlowControl: 0}, function() {
-      device.set_receive_handler(function(data) {
-        processInput(new Uint8Array(data));
-      });
-    });
-
-    poller = setInterval(function() {
-      pingDevice();
-    }, 1000);
-
-    watchdog = setTimeout(function() {
-      clearTimeout(poller);
-      poller = null;
-      device.set_receive_handler(null);
-      device.close();
-      device = null;
-      tryNextDevice();
-    }, 5000);
-  }
-
-  function pingDevice() {
-    device.send(new Uint8Array([CMD_PING]).buffer);
-  }
-
-  function processInput(inputData) {
-    lastReadTime = Date.now();
-    for (var i=0; i<inputData.length; i++) {
-      if (parsingCmd) {
-        storedInputData[bytesRead++] = inputData[i];
-        if (bytesRead === waitForData) {
-          parsingCmd = false;
-          processCmd();
-        }
-      } else {
-        switch (inputData[i]) {
-        case CMD_PING:
-          parsingCmd = true;
-          command = inputData[i];
-          waitForData = 2;
-          bytesRead = 0;
-          break;
-        case CMD_ANALOG_READ:
-          parsingCmd = true;
-          command = inputData[i];
-          waitForData = 6;
-          bytesRead = 0;
-          break;
-        case CMD_DIGITAL_READ:
-          parsingCmd = true;
-          command = inputData[i];
-          waitForData = 12;
-          bytesRead = 0;
-          break;
-        case CMD_IMU_READ:
-          parsingCmd = true;
-          command = inputData[i];
-          waitForData = 4;
-          bytesRead = 0;
-          break;
-        case CMD_IMU_EVENT:
-          parsingCmd = true;
-          command = inputData[i];
-          waitForData = 3;
-          bytesRead = 0;
-          break;
-        }
-      }
+    // Private logic
+    function getSensorPressed(which) {
+        if (device == null) return false;
+        if (which == 'button pressed' && getSensor('button') < 1) return true;
+        if (which == 'A connected' && getSensor('resistance-A') < 10) return true;
+        if (which == 'B connected' && getSensor('resistance-B') < 10) return true;
+        if (which == 'C connected' && getSensor('resistance-C') < 10) return true;
+        if (which == 'D connected' && getSensor('resistance-D') < 10) return true;
+        return false;
     }
-  }
 
+    function getSensor(which) {
+        return inputs[which];
+    }
 
-  function processCmd() {
-    switch (command) {
-    case CMD_PING:
-      if (storedInputData[0] === CMD_PING_CONFIRM) {
-        connected = true;
-        clearTimeout(watchdog);
-        watchdog = null;
-        clearInterval(poller);
+    var inputArray = [];
+    function processData() {
+        var bytes = new Uint8Array(rawData);
+
+        inputArray[15] = 0;
+
+        // TODO: make this robust against misaligned packets.
+        // Right now there's no guarantee that our 18 bytes start at the beginning of a message.
+        // Maybe we should treat the data as a stream of 2-byte packets instead of 18-byte packets.
+        // That way we could just check the high bit of each byte to verify that we're aligned.
+        for(var i=0; i<9; ++i) {
+            var hb = bytes[i*2] & 127;
+            var channel = hb >> 3;
+            var lb = bytes[i*2+1] & 127;
+            inputArray[channel] = ((hb & 7) << 7) + lb;
+        }
+
+        if (watchdog && (inputArray[15] == 0x04)) {
+            // Seems to be a valid PicoBoard.
+            clearTimeout(watchdog);
+            watchdog = null;
+        }
+
+        for(var name in inputs) {
+            var v = inputArray[channels[name]];
+            if(name == 'light') {
+                v = (v < 25) ? 100 - v : Math.round((1023 - v) * (75 / 998));
+            }
+            else if(name == 'sound') {
+                //empirically tested noise sensor floor
+                v = Math.max(0, v - 18)
+                v =  (v < 50) ? v / 2 :
+                    //noise ceiling
+                    25 + Math.min(75, Math.round((v - 50) * (75 / 580)));
+            }
+            else {
+                v = (100 * v) / 1023;
+            }
+
+            inputs[name] = v;
+        }
+
+        //console.log(inputs);
+        rawData = null;
+    }
+
+    function appendBuffer( buffer1, buffer2 ) {
+        var tmp = new Uint8Array( buffer1.byteLength + buffer2.byteLength );
+        tmp.set( new Uint8Array( buffer1 ), 0 );
+        tmp.set( new Uint8Array( buffer2 ), buffer1.byteLength );
+        return tmp.buffer;
+    }
+
+    // Extension API interactions
+    var potentialDevices = [];
+    ext._deviceConnected = function(dev) {
+        potentialDevices.push(dev);
+
+        if (!device) {
+            tryNextDevice();
+        }
+    }
+
+    var poller = null;
+    var watchdog = null;
+    function tryNextDevice() {
+        // If potentialDevices is empty, device will be undefined.
+        // That will get us back here next time a device is connected.
+        device = potentialDevices.shift();
+        if (!device) return;
+
+        device.open({ stopBits: 0, bitRate: 38400, ctsFlowControl: 0 });
+        device.set_receive_handler(function(data) {
+            //console.log('Received: ' + data.byteLength);
+            if(!rawData || rawData.byteLength == 18) rawData = new Uint8Array(data);
+            else rawData = appendBuffer(rawData, data);
+
+            if(rawData.byteLength >= 18) {
+                //console.log(rawData);
+                processData();
+                //device.send(pingCmd.buffer);
+            }
+        });
+
+        // Tell the PicoBoard to send a input data every 50ms
+        var pingCmd = new Uint8Array(1);
+        pingCmd[0] = 1;
         poller = setInterval(function() {
-          if (Date.now() - lastReadTime > 5000) {
-            connected = false;
+            device.send(pingCmd.buffer);
+        }, 50);
+        watchdog = setTimeout(function() {
+            // This device didn't get good data in time, so give up on it. Clean up and then move on.
+            // If we get good data then we'll terminate this watchdog.
+            clearInterval(poller);
+            poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
-            clearInterval(poller);
-            poller = null;
-          }
-        }, 2000);
-      }
-      break;
-    case CMD_ANALOG_READ:
-      analogInputData = storedInputData.slice(0, 6);
-      break;
-    case CMD_DIGITAL_READ:
-      digitalInputData = storedInputData.slice(0, 12);
-      break;
-    case CMD_IMU_READ:
-      for (var i=0; i<2; i++) {
-        accelInputData[i] = storedInputData[(i*2)+1];
-        if (storedInputData[i*2]) accelInputData[i] *= -1;
-      }
-      break;
-    case CMD_IMU_EVENT:
-      imuEventData = storedInputData.slice(0, 3);
-      break;
+            tryNextDevice();
+        }, 250);
+    };
+
+    ext._deviceRemoved = function(dev) {
+        if(device != dev) return;
+        if(poller) poller = clearInterval(poller);
+        device = null;
+    };
+
+    ext._shutdown = function() {
+        if(device) device.close();
+        if(poller) poller = clearInterval(poller);
+        device = null;
+    };
+
+    ext._getStatus = function() {
+        if(!device) return {status: 1, msg: 'PicoBoard disconnected'};
+        if(watchdog) return {status: 1, msg: 'Probing for PicoBoard'};
+        return {status: 2, msg: 'PicoBoard connected'};
     }
-  }
 
-  ext.analogWrite = function(pin, val) {
-    analogWrite(pin, val);
-  };
-
-  ext.digitalWrite = function(pin, val) {
-    if (val == 'on')
-      digitalWrite(pin, HIGH);
-    else if (val == 'off')
-      digitalWrite(pin, LOW);
-  };
-
-  ext.analogRead = function(pin) {
-    return analogRead(pin);
-  };
-
-  ext.digitalRead = function(pin) {
-    return digitalRead(pin);
-  };
-
-  ext.whenAnalogRead = function(pin, op, val) {
-    if (ANALOG_PINS.indexOf(pin) === -1) return
-    if (op == '>')
-      return analogRead(pin) > val;
-    else if (op == '<')
-      return analogRead(pin) < val;
-    else if (op == '=')
-      return analogRead(pin) == val;
-    else
-      return false;
-  };
-
-  ext.whenDigitalRead = function(pin, val) {
-    if (val == 'on')
-      return digitalRead(pin);
-    else if (val == 'off') {
-      return digitalRead(pin) == 0;
-    }
-  };
-
-  ext.rotateServo = function(pin, deg) {
-    if (deg < 0) deg = 0;
-    else if (deg > 180) deg = 180;
-    rotateServo(pin, deg);
-  };
-
-  ext.servoPosition = function(pin) {
-    return servoVals[pin];
-  };
-
-  ext.getTilt = function(coord) {
-    switch (coord) {
-    case 'up':
-      return accelInputData[0];
-    case 'down':
-      return -accelInputData[0];
-    case 'left':
-      return -accelInputData[1];
-    case 'right':
-      return accelInputData[1];
-    }
-  };
-
-  ext.whenIMUEvent = function(imuEvent) {
-    return imuEventData[IMU_EVENT_SHAKE];
-  };
-
-  ext._getStatus = function() {
-    if (connected) return {status: 2, msg: 'Arduino connected'};
-    else return {status: 1, msg: 'Arduino disconnected'};
-  };
-
-  ext._deviceConnected = function(dev) {
-    potentialDevices.push(dev);
-    if (!device) tryNextDevice();
-  };
-
-  ext._deviceRemoved = function(dev) {
-    console.log('device removed');
-    pinModes = new Uint8Array(12);
-    if (device != dev) return;
-    device = null;
-  };
-
-  ext._shutdown = function() {
-    // TODO: Bring all pins down
-    if (device) device.close();
-    device = null;
-  };
-
-  var blocks = [
-    [' ', '设置 数字%m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on']
- 
-
-  var menus = {
-  	DigitalIOName:['D1','D2','D3','D4','D5','D6'],
-  	DigitalIOmode:['输入','输出'],
-  	DigitalIOOutType:['低','高'],
-  	AnalogInPortName:['A1','A2','A3'],
-  	AnalogOutPortName:['PWM1','PWM2']
-  };
-
-  var descriptor = {
-    blocks: blocks,
-    menus: menus,
-    url: 'http://khanning.github.io/scratch-arduino-extension'
-  };
-
-  ScratchExtensions.register('Scratch Mini Board', descriptor, ext, {type: 'serial'});
+    var descriptor = {
+        blocks: [
+            ['h', 'when %m.booleanSensor',         'whenSensorConnected', 'button pressed'],
+            ['h', 'when %m.sensor %m.lessMore %n', 'whenSensorPass',      'slider', '>', 50],
+            ['b', 'sensor %m.booleanSensor?',      'sensorPressed',       'button pressed'],
+            ['r', '%m.sensor sensor value',        'sensor',              'slider']
+        ],
+        menus: {
+            booleanSensor: ['button pressed', 'A connected', 'B connected', 'C connected', 'D connected'],
+            sensor: ['slider', 'light', 'sound', 'resistance-A', 'resistance-B', 'resistance-C', 'resistance-D'],
+            lessMore: ['>', '<']
+        },
+        url: '/info/help/studio/tips/ext/PicoBoard/'
+    };
+    ScratchExtensions.register('PicoBoard', descriptor, ext, {type: 'serial'});
 })({});
