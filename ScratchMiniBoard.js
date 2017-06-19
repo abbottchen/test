@@ -308,9 +308,11 @@
   };
 
   var blocks = [
-    [' ', '设置 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on'],
-    [' ', '输出 %m.DigitalIOOutType 电平到  %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1'],
-    
+    [' ', '设置 数字%m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on'],
+    [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1'],
+    ['r ', '数字脚 %m.DigitalIOName 脚 输入电平', 'digitalRead', 'D1'],
+    ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'digitalRead', 'A1'],
+    [' ', '输出 %d ms(周期),占空比 d%(0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'digitalRead', 0,0，'PWM1'],
     [' ', 'set pin %d.analogOutputs to %n%', 'analogWrite', 9, 100],
     ['h', 'when pin %d.digitalInputs is %m.outputs', 'whenDigitalRead', 9, 'on'],
     ['b', 'pin %d.digitalInputs on?', 'digitalRead', 9],
@@ -329,7 +331,8 @@
   	DigitalIOName:['D1','D2','D3','D4','D5','D6'],
   	DigitalIOmode:['输入','输出'],
   	DigitalIOOutType:['低','高'],
-  	
+  	AnalogInPortName:['A1','A2','A3'],
+  	AnalogOutPortName:['PWM1','PWM2'],
     digitalOutputs: DIGITAL_PINS,
     analogOutputs: PWM_PINS,
     digitalInputs: DIGITAL_PINS,
@@ -345,5 +348,5 @@
     url: 'http://khanning.github.io/scratch-arduino-extension'
   };
 
-  ScratchExtensions.register('Arduino 101', descriptor, ext, {type: 'serial'});
+  ScratchExtensions.register('Scratch Mini Board', descriptor, ext, {type: 'serial'});
 })({});
