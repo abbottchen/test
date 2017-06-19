@@ -164,7 +164,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 500);
+        }, 3000);
     };
 	
     ext.resetAll = function(){};	
