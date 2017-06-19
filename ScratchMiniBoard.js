@@ -34,6 +34,7 @@
     
     function GetFrameFromLoopBuf() {
         var RevDataCount=0;
+	inputs['D1']=22;    
         while(1)//获取正确的合法帧
 	{
 			if(RevLoopInPt>=RevLoopOutPt)
@@ -169,9 +170,8 @@
     };
 
     ext._getStatus = function() {
-	    /*
         if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
-        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};*/
+        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
         return {status: 2, msg: 'ScratchMiniBoard connected'};
     }
 
