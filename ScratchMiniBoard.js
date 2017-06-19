@@ -11,15 +11,15 @@
     var DataLen=0;
     
     var inputs = {
-        D1: 1,
-        D2: 2,
-        D3: 3,
-        D4: 4,
-        D5: 5,
-        D6: 6,
-        A1: 7,
-        A2: 8,
-        A3: 9
+        'D1': 1,
+        'D2': 2,
+        'D3': 3,
+        'D4': 4,
+        'D5': 5,
+        'D6': 6,
+        'A1': 7,
+        'A2': 8,
+        'A3': 9
     };
 
     ext.resetAll = function(){};
@@ -188,10 +188,10 @@
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
-  	        DigitalIOmode:['输入','输出'],
-  	        DigitalIOOutType:['低','高'],
-  	        AnalogInPortName:['A1','A2','A3'],
-  	        AnalogOutPortName:['PWM1','PWM2']
+  	    DigitalIOmode:['输入','输出'],
+  	    DigitalIOOutType:['低','高'],
+  	    AnalogInPortName:['A1','A2','A3'],
+  	    AnalogOutPortName:['PWM1','PWM2']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
