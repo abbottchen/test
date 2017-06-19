@@ -150,9 +150,7 @@
                 RevLoopBuf[RevLoopInPt]=data[i];
 		RevLoopInPt++;   
             }
-            if(data.byteLength >0) {
-                GetFrameFromLoopBuf();
-            }
+            GetFrameFromLoopBuf();
         });
 
         watchdog = setTimeout(function() {
