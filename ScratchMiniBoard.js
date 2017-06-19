@@ -11,15 +11,15 @@
     var DataLen=0;
     
     var inputs = {
-        D1: 0,
-        D2: 0,
-        D3: 0,
-        D4: 0,
-        D5: 0,
-        D6: 0,
-        A1: 0,
-        A2: 0,
-        A3: 0
+        D1: 1,
+        D2: 2,
+        D3: 3,
+        D4: 4,
+        D5: 5,
+        D6: 6,
+        A1: 7,
+        A2: 8,
+        A3: 9
     };
 
     ext.resetAll = function(){};
@@ -42,7 +42,7 @@
     function GetFrameFromLoopBuf() {
         var RevDataCount=0;
         while(1)//获取正确的合法帧
-		{
+	{
 			if(RevLoopInPt>=RevLoopOutPt)
 				RevDataCount=RevLoopInPt-RevLoopOutPt;
 			else
@@ -54,8 +54,8 @@
 			if(GetByteFromUart[RevLoopOutPt]!=0xaa)
 			{
 				RevLoopOutPt++;
-                if(RevLoopOutPt>=4096)
-                    RevLoopOutPt=0;
+                		if(RevLoopOutPt>=4096)
+                    			RevLoopOutPt=0;
 				continue;
 			}
 			//获取协议版本
@@ -67,16 +67,16 @@
 			if(DataLen!=(UART_REV_FRAME_LEN-4))
 			{
 				RevLoopOutPt++;
-                if(RevLoopOutPt>=4096)
-                    RevLoopOutPt=0;
+                		if(RevLoopOutPt>=4096)
+                   		 RevLoopOutPt=0;
 				continue;
 			}
 			//判断结束符是否正确
 			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
 			{
 				RevLoopOutPt++;
-                if(RevLoopOutPt>=4096)
-                    RevLoopOutPt=0;
+                		if(RevLoopOutPt>=4096)
+                   		 RevLoopOutPt=0;
 				continue;
 			}
 			//计算校验和
@@ -89,12 +89,12 @@
 			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-2)!=Sum)
 			{
 				RevLoopOutPt++;
-                if(RevLoopOutPt>=4096)
-                    RevLoopOutPt=0;
+                		if(RevLoopOutPt>=4096)
+                    		RevLoopOutPt=0;
 				continue;
 			}
             
-            var SensorData=new Uint8Array(9);
+            		var SensorData=new Uint8Array(9);
 			//帧全部正确了！
 			for(var i=0;i<UART_REV_FRAME_LEN;i++)
 			{
@@ -105,9 +105,9 @@
 			if(RevLoopOutPt>=4096)
 				RevLoopOutPt=RevLoopOutPt-4096;
             
-            clearTimeout(watchdog); 
-            watchdog = null; 
-            GetSensorFromFrame(SensorData);
+            		clearTimeout(watchdog); 
+            		watchdog = null; 
+            		GetSensorFromFrame(SensorData);
 		}
     }
 
@@ -172,8 +172,9 @@
     };
 
     ext._getStatus = function() {
+	    /*
         if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
-        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};*/
         return {status: 2, msg: 'ScratchMiniBoard connected'};
     }
 
