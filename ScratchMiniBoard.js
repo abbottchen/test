@@ -116,7 +116,7 @@
         device = potentialDevices.shift();
         if (!device) return;
 
-        device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
+        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 	    var rawData = new Uint8Array(data);	
 	    console.log('Received size' + data.byteLength);	
