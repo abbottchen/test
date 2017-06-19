@@ -99,9 +99,9 @@
         device.set_receive_handler(function(data) {
 	    clearTimeout(watchdog); 
             watchdog = null;
-            console.log('Received: ' + data.length);
+            console.log('Received: ' + data.byteLength);
             //放置接收的数据到环形缓冲区
-            for(var i=0;i<data.length;i++)
+            for(var i=0;i<data.byteLength;i++)
             {
 		console.log('Received Data[]:' +i+':'+ data[i]);
 		GetFrame(data[i]);  
