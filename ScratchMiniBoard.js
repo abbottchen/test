@@ -35,54 +35,55 @@
     }
     
     function GetFrameFromLoopBuf() {
-        var RevDataCount=0;
-	inputs['D1']=22;
-	inputs['D6']=inputs['D6']+1;    
+        var RevDataCount=0;   
         while (true)//获取正确的合法帧
 	{
-			inputs['D1']=25;
-			inputs['D4']=RevLoopInPt;
-			if(RevLoopInPt>=RevLoopOutPt)
-				RevDataCount=RevLoopInPt-RevLoopOutPt;
-			else
-				RevDataCount=4096-RevLoopOutPt+RevLoopInPt;
+		console.log('1,RevLoopInPt: ' +RevLoopInPt);
+		console.log('2,RevLoopOutPt: ' +RevLoopInPt);
+		
+		if(RevLoopInPt>=RevLoopOutPt)
+			RevDataCount=RevLoopInPt-RevLoopOutPt;
+		else
+			RevDataCount=4096-RevLoopOutPt+RevLoopInPt;
 			
-			inputs['D1']=27; 
-			//帧长度不够,继续等待帧长度够时，再处理
-			if(RevDataCount<UART_REV_FRAME_LEN)
-				return;
-			inputs['D2']=20;
-			//判断帧头是否正确
-			if(GetByteFromUart[RevLoopOutPt]!=0xaa)
-			{
-				RevLoopOutPt++;
-                		if(RevLoopOutPt>=4096)
-                    			RevLoopOutPt=0;
-				continue;
-			}
-			inputs['D3']=33;	
-			//获取协议版本
-			ProtocolVer=GetByteFromUart(RevLoopOutPt+1)&0x30;
-			ProtocolVer=ProtocolVer>>4;
+		console.log('3,RevDataCount: ' +RevDataCount);
+		
+		//帧长度不够,继续等待帧长度够时，再处理
+		if(RevDataCount<UART_REV_FRAME_LEN)
+			return;
+	
+		console.log('4,GetByteFromUart[RevLoopOutPt]: ' +GetByteFromUart[RevLoopOutPt]);
+		//判断帧头是否正确
+		if(GetByteFromUart[RevLoopOutPt]!=0xaa)
+		{
+			RevLoopOutPt++;
+                	if(RevLoopOutPt>=4096)
+                    		RevLoopOutPt=0;
+			continue;
+		}
+		
+		//获取协议版本
+		ProtocolVer=GetByteFromUart(RevLoopOutPt+1)&0x30;
+		ProtocolVer=ProtocolVer>>4;
 
-			//判断长度是否正确
-			DataLen=GetByteFromUart(RevLoopOutPt+1)&0x0f;
-			if(DataLen!=(UART_REV_FRAME_LEN-4))
-			{
-				RevLoopOutPt++;
-                		if(RevLoopOutPt>=4096)
+		//判断长度是否正确
+		DataLen=GetByteFromUart(RevLoopOutPt+1)&0x0f;
+		if(DataLen!=(UART_REV_FRAME_LEN-4))
+		{
+			RevLoopOutPt++;
+                	if(RevLoopOutPt>=4096)
+                   		RevLoopOutPt=0;
+			continue;
+		}
+		
+		//判断结束符是否正确
+		if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
+		{
+			RevLoopOutPt++;
+                	if(RevLoopOutPt>=4096)
                    		 RevLoopOutPt=0;
-				continue;
-			}
-			inputs['D3']=44;
-			//判断结束符是否正确
-			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
-			{
-				RevLoopOutPt++;
-                		if(RevLoopOutPt>=4096)
-                   		 RevLoopOutPt=0;
-				continue;
-			}
+			continue;
+		}
 			inputs['D3']=55;
 			//计算校验和
 			var Sum=0;
@@ -117,7 +118,7 @@
     }
 
     function GetSensorFromFrame(frame) {
-        inputs['D3']=99;
+      
     }
     
     // Extension API interactions
@@ -141,7 +142,6 @@
 	    clearTimeout(watchdog); 
             watchdog = null;
             console.log('Received: ' + data.byteLength);
-	    inputs['D1']=11;	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
@@ -150,7 +150,6 @@
                 RevLoopBuf[RevLoopInPt]=data[i];
 		RevLoopInPt++;   
             }
-	    inputs['D5']=RevLoopInPt;
             if(data.byteLength >0) {
                 GetFrameFromLoopBuf();
             }
