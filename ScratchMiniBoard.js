@@ -8,7 +8,6 @@
     var FrameBuf= new Uint8Array(300);
     var DataLen=0;
 	
-
     var inputs = {
         'D1': 0,
         'D2': 0,
@@ -20,6 +19,70 @@
         'A2': 0,
         'A3': 0
     };
+   var DigitIoPortMode = {
+        'D1': '输入',
+        'D2': '输入',
+        'D3': '输入',
+        'D4': '输入',
+        'D5': '输入',
+        'D6': '输入'
+   };
+  var DigitIoPortLevel = {
+        'D1': '低',
+        'D2': '低',
+        'D3': '低',
+        'D4': '低',
+        'D5': '低',
+        'D6': '低'
+   };
+	
+    var AnalogOutPortPram = {
+        'PWM1': '输入','低',
+        'PWM2': '输入','低'
+   };
+  
+    //设置工作模式
+    function SetDigitIoPortMode(which,Mode) {
+        DigitIoPortMode[which]=Mode; 
+    }
+    
+   function SetDigitIoPortLevel(which,level) {
+        DigitIoPortLevel[which]=level; 
+    }
+/*
+	typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
+{	
+	uint8	Head;
+	uint8	Len:4;
+	uint8	Ver:3;
+	uint8	Direction:1;
+	uint8	PIN7MODE:2;	//D6
+	uint8	PIN8MODE:2;	//PWM2
+	uint8	PIN9MODE:3;	//PWM1
+	uint8	PIN10MODE:2;	//D5
+	uint8	PIN11MODE:1;	//D4
+	uint8	PIN12MODE:1;	//D3
+	uint8	PIN17MODE:1;	//D1
+	uint8	PIN18MODE:1;	//NC
+	uint8	PIN19MODE:1;	//NC
+	uint8	PIN20MODE:1;	//D2
+	uint8	Reserve1:1;
+	uint8	PIN7WorkPram;
+	uint8	PIN8WorkPram;
+	uint8	PIN9WorkPram[3];
+	uint8	PIN10WorkPram;
+	uint8	PIN11OutputLevel:1;
+	uint8	PIN12OutputLevel:1;
+	uint8	PIN17OutputLevel:1;
+	uint8	PIN18OutputLevel:1;
+	uint8	PIN19OutputLevel:1;
+	uint8	PIN20OutputLevel:1;
+	uint8	Reserve2:2;
+	uint8	CS;
+	uint8	End;
+}STRUCT_SCRATCH_CONTROL_BOARD_IN;
+*/	
+	
 	
     function getSensor(which) {
         return inputs[which];
