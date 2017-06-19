@@ -182,11 +182,9 @@
 
     var descriptor = {
         blocks: [
-            ['h', 'when %m.booleanSensor',         'whenSensorConnected', 'button pressed'],
             ['h', 'when %m.sensor %m.lessMore %n', 'whenSensorPass',      'slider', '>', 50],
             ['b', 'sensor %m.booleanSensor?',      'sensorPressed',       'button pressed'],
-            ['r', '%m.sensor sensor value',        'sensor',              'slider'],
-            [' ', '设置 数字%m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on']
+            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on']
         ],
         menus: {
             booleanSensor: ['button pressed', 'A connected', 'B connected', 'C connected', 'D connected'],
