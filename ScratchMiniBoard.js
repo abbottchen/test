@@ -125,7 +125,7 @@
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-		console.log(rawData[i]);
+		//console.log(rawData[i]);
 		GetFrame(rawData[i]);  
             }
         });
