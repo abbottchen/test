@@ -179,11 +179,11 @@
 
     var descriptor = {
         blocks: [
-            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'getSensor', 'D1', '输入'],
-            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'getSensor', '低', 'D1'],
-            ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'getSensor', 'D1'],
-            ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'getSensor', 'A1'],
-            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'getSensor', 0,0,'PWM1']
+            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'sensor', 'D1', '输入'],
+            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'sensor', '低', 'D1'],
+            ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
+            ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
+            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'sensor', 0,0,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
