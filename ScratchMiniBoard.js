@@ -3,13 +3,12 @@
 (function(ext) {
     var UART_REV_FRAME_LEN=9;
     var device = null;
-    var rawData = null;
-    var RevLoopBuf = new Uint8Array(4096);
-    var RevLoopInPt=0;
-    var RevLoopOutPt=0;
-    var ProtocolVer=0;
+
+    var	FrameStep=0;
+    var FrameBuf= new Uint8Array(300);
     var DataLen=0;
-    
+	
+
     var inputs = {
         'D1': 1,
         'D2': 2,
@@ -28,99 +27,58 @@
         return inputs[which];
     }
     
-    function GetByteFromUart(pt){
-	    if(pt>=4096)
-		    pt=pt-4096;
-	    return (RevLoopBuf[pt]);
-    }
+
     
-    function GetFrameFromLoopBuf() {
-        var RevDataCount=0;   
-        while (true)//获取正确的合法帧
-	{
-		console.log('1,RevLoopInPt: ' +RevLoopInPt);
-		console.log('2,RevLoopOutPt: ' +RevLoopInPt);
-		
-		if(RevLoopInPt>=RevLoopOutPt)
-			RevDataCount=RevLoopInPt-RevLoopOutPt;
+    function GetFrame(ch) {
+	 //AA 95 4F FE FE FE BF 47 16
+	 console.log('FrameStep: ' + FrameStep);
+	 if(FrameStep>280)
+		FrameStep=0; 
+	//等待接收帧头    
+        if(FrameStep==0){
+		if(ch==0xaa){
+			FrameStep=1;
+			FrameBuf[0]=ch;
+			console.log('GetFrame Head OK: ' + FrameBuf);
+		}
+	}
+	//接收数据长度
+	else if(FrameStep==1){  
+	    	DataLen=ch&0x0f;
+	    	FrameStep=2;
+	    	FrameBuf[1]=ch;
+	}
+	else if((FrameStep>=2)&&(FrameStep<(2+DataLen))){
+		FrameBuf[FrameStep]=ch;
+		FrameStep++;
+	}
+	else if(FrameStep==(2+DataLen)){
+		FrameBuf[FrameStep]=ch;
+		var Sum=0;
+		for(var i=0;i<(2+DataLen);i++){	
+			Sum=Sum+FrameBuf[i];
+		}
+		if(ch!=Sum)
+		{
+			FrameStep=0;
+			DataLen=0;
+		}
 		else
-			RevDataCount=4096-RevLoopOutPt+RevLoopInPt;
+		{
+			FrameStep++;
+		}
+	}
+	else if(FrameStep==(3+DataLen)){   
+	    	if(ch==0x16){
 			
-		console.log('3,RevDataCount: ' +RevDataCount);
-		
-		//帧长度不够,继续等待帧长度够时，再处理
-		if(RevDataCount<UART_REV_FRAME_LEN)
-			return;
-	
-		console.log('4,GetByteFromUart[RevLoopOutPt]: ' +GetByteFromUart[RevLoopOutPt]);
-		//判断帧头是否正确
-		if(GetByteFromUart[RevLoopOutPt]!=0xaa)
-		{
-			RevLoopOutPt++;
-                	if(RevLoopOutPt>=4096)
-                    		RevLoopOutPt=0;
-			continue;
-		}
-		
-		//获取协议版本
-		ProtocolVer=GetByteFromUart(RevLoopOutPt+1)&0x30;
-		ProtocolVer=ProtocolVer>>4;
-
-		//判断长度是否正确
-		DataLen=GetByteFromUart(RevLoopOutPt+1)&0x0f;
-		if(DataLen!=(UART_REV_FRAME_LEN-4))
-		{
-			RevLoopOutPt++;
-                	if(RevLoopOutPt>=4096)
-                   		RevLoopOutPt=0;
-			continue;
-		}
-		
-		//判断结束符是否正确
-		if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-1)!=0x16)
-		{
-			RevLoopOutPt++;
-                	if(RevLoopOutPt>=4096)
-                   		 RevLoopOutPt=0;
-			continue;
-		}
-			inputs['D3']=55;
-			//计算校验和
-			var Sum=0;
-			for(var i=0;i<(UART_REV_FRAME_LEN-2);i++)
-			{
-				Sum=Sum+GetByteFromUart(RevLoopOutPt+i);
-			}
-			//判断校验和是否正确
-			if(GetByteFromUart(RevLoopOutPt+UART_REV_FRAME_LEN-2)!=Sum)
-			{
-				RevLoopOutPt++;
-                		if(RevLoopOutPt>=4096)
-                    		RevLoopOutPt=0;
-				continue;
-			}
-            		inputs['D3']=66;
-            		var SensorData=new Uint8Array(9);
-			//帧全部正确了！
-			for(var i=0;i<UART_REV_FRAME_LEN;i++)
-			{
-				SensorData[i]=GetByteFromUart(RevLoopOutPt+i);
-			}
-			//调整Out指针
-			RevLoopOutPt=RevLoopOutPt+UART_REV_FRAME_LEN;
-			if(RevLoopOutPt>=4096)
-				RevLoopOutPt=RevLoopOutPt-4096;
-            		inputs['D3']=77;
-            		clearTimeout(watchdog); 
-            		watchdog = null; 
-            		GetSensorFromFrame(SensorData);
-		}
+	    	}
+	        else{
+			FrameStep=0;
+			DataLen=0;
+		}	
+	}
     }
 
-    function GetSensorFromFrame(frame) {
-      
-    }
-    
     // Extension API interactions
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
@@ -145,12 +103,8 @@
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-                if(RevLoopInPt>=4096)
-                    RevLoopInPt=0;
-                RevLoopBuf[RevLoopInPt]=data[i];
-		RevLoopInPt++;   
+			GetFrame(data[i]);  
             }
-            GetFrameFromLoopBuf();
         });
 
         watchdog = setTimeout(function() {
