@@ -22,13 +22,6 @@
         'A3': 9
     };
 
-    ext.resetAll = function(){};
-
-    // Hats / triggers
-    ext.whenSensorConnected = function(which) {
-        return getSensorPressed(which);
-    };
-
     function getSensor(which) {
         //return inputs[which];
 	    
@@ -160,7 +153,11 @@
             tryNextDevice();
         }, 500);
     };
+	
+    ext.resetAll = function(){};	
 
+    ext.sensor = function(which) { return getSensor(which); };	
+	
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
         if(poller) poller = clearInterval(poller);
