@@ -16,14 +16,15 @@
         'resistance-D': 0
     };
     var inputs = {
-        slider: 0,
-        light: 0,
-        sound: 0,
-        button: 0,
-        'resistance-A': 0,
-        'resistance-B': 0,
-        'resistance-C': 0,
-        'resistance-D': 0
+        D1: 0,
+        D2: 0,
+        D3: 0,
+        D4: 0,
+        D5: 0,
+        D6: 0,
+        A1: 0,
+        A2: 0,
+        A3: 0
     };
 
     ext.resetAll = function(){};
@@ -70,19 +71,20 @@
         // Right now there's no guarantee that our 18 bytes start at the beginning of a message.
         // Maybe we should treat the data as a stream of 2-byte packets instead of 18-byte packets.
         // That way we could just check the high bit of each byte to verify that we're aligned.
+        /*
         for(var i=0; i<9; ++i) {
             var hb = bytes[i*2] & 127;
             var channel = hb >> 3;
             var lb = bytes[i*2+1] & 127;
             inputArray[channel] = ((hb & 7) << 7) + lb;
-        }
+        }*/
 
-        if (watchdog && (inputArray[15] == 0x04)) {
+        if (watchdog && (bytes[00] == 0xaa)) {
             // Seems to be a valid PicoBoard.
             clearTimeout(watchdog);
             watchdog = null;
         }
-
+/*
         for(var name in inputs) {
             var v = inputArray[channels[name]];
             if(name == 'light') {
@@ -103,6 +105,7 @@
         }
 
         //console.log(inputs);
+        */
         rawData = null;
     }
 
@@ -134,10 +137,10 @@
         device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
             //console.log('Received: ' + data.byteLength);
-            if(!rawData || rawData.byteLength == 18) rawData = new Uint8Array(data);
+            if(!rawData || rawData.byteLength == 9) rawData = new Uint8Array(data);
             else rawData = appendBuffer(rawData, data);
 
-            if(rawData.byteLength >= 18) {
+            if(rawData.byteLength >= 9) {
                 //console.log(rawData);
                 //clearTimeout(watchdog);
                 //watchdog = null;
