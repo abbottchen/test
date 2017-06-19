@@ -129,7 +129,6 @@
         }
     }
 
-    var poller = null;
     var watchdog = null;
     function tryNextDevice() {
         // If potentialDevices is empty, device will be undefined.
@@ -158,15 +157,11 @@
         });
 
         watchdog = setTimeout(function() {
-            // This device didn't get good data in time, so give up on it. Clean up and then move on.
-            // If we get good data then we'll terminate this watchdog.
-            clearInterval(poller);
-            poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
             tryNextDevice();
-        }, 3000);
+        }, 5000);
     };
 	
     ext.resetAll = function(){};	
@@ -175,13 +170,11 @@
 	
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
-        if(poller) poller = clearInterval(poller);
         device = null;
     };
 
     ext._shutdown = function() {
         if(device) device.close();
-        if(poller) poller = clearInterval(poller);
         device = null;
     };
 
