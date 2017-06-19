@@ -198,5 +198,5 @@
         },
         url: '/info/help/studio/tips/ext/PicoBoard/'
     };
-    ScratchExtensions.register('PicoBoard', descriptor, ext, {type: 'serial'});
+    ScratchExtensions.register('Scratch Mini Board', descriptor, ext, {type: 'serial'});
 })({});
