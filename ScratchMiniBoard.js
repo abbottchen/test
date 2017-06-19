@@ -138,7 +138,7 @@
             else rawData = appendBuffer(rawData, data);
 
             if(rawData.byteLength >= 18) {
-                console.log(rawData);
+                //console.log(rawData);
                 clearTimeout(watchdog);
                 watchdog = null;
                 //processData();
