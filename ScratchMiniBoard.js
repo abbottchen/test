@@ -10,15 +10,15 @@
 	
 
     var inputs = {
-        'D1': 1,
-        'D2': 2,
-        'D3': 3,
-        'D4': 4,
-        'D5': 5,
-        'D6': 6,
-        'A1': 7,
-        'A2': 8,
-        'A3': 9
+        'D1': 0,
+        'D2': 0,
+        'D3': 0,
+        'D4': 0,
+        'D5': 0,
+        'D6': 0,
+        'A1': 0,
+        'A2': 0,
+        'A3': 0
     };
 
     inputs['D1']=2;
@@ -27,8 +27,40 @@
         return inputs[which];
     }
     
-
-    
+    function getSensorFromFrame(Frame){
+	    /*
+	    typedef struct STRUCT_SCRATCH_CONTROL_BOARD_OUT		//
+{	
+	uint8	PIN7InputLevel:1;               //D6
+	uint8	PIN8InputLevel:1;               //PWM2
+	uint8	PIN9InputLevel:1;               //PWM1
+	uint8	PIN10InputLevel:1;              //D5
+	uint8	PIN11InputLevel:1;              //D4
+	uint8	PIN12InputLevel:1;              //D3
+	uint8	PIN17InputLevel:1;              //D1
+	uint8	PIN18InputLevel:1;              //NC
+	uint8	ADCPort1;
+	uint8	ADCPort2;
+	uint8	ADCPort3;
+	uint8	ADCPort1HBit:2;
+	uint8	ADCPort2HBit:2;
+	uint8	ADCPort3HBit:2;
+	uint8	PIN19InputLevel:1;              //NC
+	uint8	PIN20InputLevel:1;              //D2
+}STRUCT_SCRATCH_CONTROL_BOARD_OUT;
+*/
+	inputs['D1']=(Frame[2]>>6)&0x01;
+	inputs['D2']=(Frame[6]>>8)&0x01;    
+    	inputs['D3']=(Frame[2]>>5)&0x01;
+	inputs['D4']=(Frame[2]>>4)&0x01;
+	inputs['D5']=(Frame[2]>>3)&0x01;
+	inputs['D6']=(Frame[2]>>0)&0x01;
+	    
+	inputs['A1']=Frame[3]+(Frame[6]&0x03)*256;    
+	inputs['A2']=Frame[4]+((Frame[6]>>2)&0x03)*256; 
+	inputs['A3']=Frame[5]+((Frame[6]>>4)&0x03)*256; 
+    }
+	
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
 	 if(FrameStep>280)
@@ -70,9 +102,13 @@
 			FrameStep++;
 		}
 	}
-	else if(FrameStep==(3+DataLen)){   
+	else if(FrameStep==(3+DataLen)){ 
+		FrameBuf[FrameStep]=ch;
 	    	if(ch==0x16){
+			clearTimeout(watchdog); 
+            		watchdog = null;
 			console.log('Frame is Ok');
+			getSensorFromFrame(FrameBuf);
 	    	}
 	        else{
 			FrameStep=0;
@@ -99,8 +135,6 @@
 
         device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
-	    clearTimeout(watchdog); 
-            watchdog = null;
 	    var rawData = new Uint8Array(data);	
 	    console.log('Received size' + data.byteLength);	
             //放置接收的数据到环形缓冲区
