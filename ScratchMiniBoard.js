@@ -138,7 +138,7 @@
             else rawData = appendBuffer(rawData, data);
 
             if(rawData.byteLength >= 18) {
-                //console.log(rawData);
+                console.log(rawData);
                 processData();
                 //device.send(pingCmd.buffer);
             }
@@ -180,7 +180,7 @@
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'digitalRead', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'digitalRead', 'A1'],
-            [' ', '输出 %d ms(周期),占空比 d% (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'digitalRead', 0,0,'PWM1']
+            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'digitalRead', 0,0,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
