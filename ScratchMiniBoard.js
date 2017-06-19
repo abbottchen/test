@@ -73,12 +73,13 @@
 			Sum=Sum+FrameBuf[i];
 		}
 		Sum=Sum%256;
-		console.log('Sum: ' + Sum);
-		console.log('ch: ' + ch);
+		//console.log('Sum: ' + Sum);
+		//console.log('ch: ' + ch);
 		if(ch!=Sum)
 		{
 			FrameStep=0;
 			DataLen=0;
+			console.log('累加和错误'+Sum);
 		}
 		else
 		{
@@ -96,6 +97,7 @@
 	        else{
 			FrameStep=0;
 			DataLen=0;
+			console.log('结束符错误'+ch);
 		}	
 	}
     }
