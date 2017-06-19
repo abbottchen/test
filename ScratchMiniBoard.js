@@ -40,6 +40,7 @@
         while (true)//获取正确的合法帧
 	{
 			inputs['D1']=25;
+			inputs['D4']=RevLoopInPt;
 			if(RevLoopInPt>=RevLoopOutPt)
 				RevDataCount=RevLoopInPt-RevLoopOutPt;
 			else
