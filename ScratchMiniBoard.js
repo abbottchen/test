@@ -139,6 +139,8 @@
 
         device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
+	    clearTimeout(watchdog); 
+            watchdog = null;
             console.log('Received: ' + data.byteLength);
 	    inputs['D1']=11;	
             //放置接收的数据到环形缓冲区
