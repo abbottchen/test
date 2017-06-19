@@ -140,7 +140,7 @@
             //console.log('Received: ' + data.byteLength);
 	    inputs['D1']=11;	
             //放置接收的数据到环形缓冲区
-            for(var i=0;i<data.length;i++)
+            for(var i=0;i<data.byteLength;i++)
             {
                 if(RevLoopInPt>=4096)
                     RevLoopInPt=0;
