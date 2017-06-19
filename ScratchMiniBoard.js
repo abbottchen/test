@@ -308,9 +308,8 @@
   };
 
   var blocks = [
-    [' ', '设置 数字%m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on'],
-    [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1']
-  ];
+    [' ', '设置 数字%m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on']
+ 
 
   var menus = {
   	DigitalIOName:['D1','D2','D3','D4','D5','D6'],
