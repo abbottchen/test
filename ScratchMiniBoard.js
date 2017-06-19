@@ -46,10 +46,10 @@
 				RevDataCount=4096-RevLoopOutPt+RevLoopInPt;
 			
 			inputs['D1']=27; 
-			inputs['D2']=RevDataCount;
 			//帧长度不够,继续等待帧长度够时，再处理
 			if(RevDataCount<UART_REV_FRAME_LEN)
 				break;
+			inputs['D2']=20;
 			//判断帧头是否正确
 			if(GetByteFromUart[RevLoopOutPt]!=0xaa)
 			{
