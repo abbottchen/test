@@ -131,7 +131,7 @@
         device = potentialDevices.shift();
         if (!device) return;
 
-        device.open({ stopBits: 0, bitRate: 38400, ctsFlowControl: 0 });
+        device.open({ stopBits: 0, bitRate: 57600, parityBit:2, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
             //console.log('Received: ' + data.byteLength);
             if(!rawData || rawData.byteLength == 18) rawData = new Uint8Array(data);
@@ -144,12 +144,6 @@
             }
         });
 
-        // Tell the PicoBoard to send a input data every 50ms
-        var pingCmd = new Uint8Array(1);
-        pingCmd[0] = 1;
-        poller = setInterval(function() {
-            device.send(pingCmd.buffer);
-        }, 50);
         watchdog = setTimeout(function() {
             // This device didn't get good data in time, so give up on it. Clean up and then move on.
             // If we get good data then we'll terminate this watchdog.
@@ -159,7 +153,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 250);
+        }, 500);
     };
 
     ext._deviceRemoved = function(dev) {
@@ -175,14 +169,14 @@
     };
 
     ext._getStatus = function() {
-        if(!device) return {status: 1, msg: 'PicoBoard disconnected'};
-        if(watchdog) return {status: 1, msg: 'Probing for PicoBoard'};
-        return {status: 2, msg: 'PicoBoard connected'};
+        if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
+        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+        return {status: 2, msg: 'ScratchMiniBoard connected'};
     }
 
     var descriptor = {
         blocks: [
-            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', 'on'],
+            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'digitalWrite', 'D1', '输入'],
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'digitalWrite', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'digitalRead', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'digitalRead', 'A1'],
@@ -195,7 +189,7 @@
   	        AnalogInPortName:['A1','A2','A3'],
   	        AnalogOutPortName:['PWM1','PWM2']
         },
-        url: '/info/help/studio/tips/ext/PicoBoard/'
+        url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
     ScratchExtensions.register('ScratchMiniBoard', descriptor, ext, {type: 'serial'});
 })({});
