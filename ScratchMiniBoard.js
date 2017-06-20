@@ -100,7 +100,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	  Sum=Sum+txbuf[i];
 	}
 	txbuf[12]=Sum%256; 	
-	txbuf[13]=0x16
+	txbuf[13]=0x16;
 	   
 	console.log('device send'+txbuf);
 	   
@@ -266,7 +266,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'sensor', 2,0,'PWM1']
+            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'sensor', 3,0,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
