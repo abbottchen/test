@@ -102,7 +102,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	txbuf[12]=Sum%256; 	
 	txbuf[13]=0x16;
 	
-	console.log('device send'+txbuf);
+	console.log('device send'+txbuf.buffer);
 	for(var i=0;i<14;i++)
 	{
 		console.log(txbuf[i]);	
