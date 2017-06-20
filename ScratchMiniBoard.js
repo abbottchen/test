@@ -119,17 +119,17 @@
    ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
 
    function SetPWMToPram(period,width,ch){ 
-	console.log('ch:'+ch);    
-	console.log('period:'+period);   
-	console.log('Width:'+width);
+	//console.log('ch:'+ch);    
+	//console.log('period:'+period);   
+	//console.log('Width:'+width);
 	   
 	period=period*1000;
-	console.log('period:'+period);   
-	console.log('Width:'+width);
+	//console.log('period:'+period);   
+	//console.log('Width:'+width);
 	   
 	Math.round(period);
-	console.log('period:'+period);   
-	console.log('Width:'+width);
+	//console.log('period:'+period);   
+	//console.log('Width:'+width);
 	   
 	if(period>65535)
 	 	period=65535;
@@ -142,8 +142,8 @@
 	console.log('period:'+period);   
 	console.log('Width:'+tmp);   
 	
-	console.log('VarAnalogOutPortPeriod[ch]:'+VarAnalogOutPortPeriod[ch]); 
-	console.log('VarAnalogOutPortWidth[ch]:'+VarAnalogOutPortWidth[ch]); 
+	//console.log('VarAnalogOutPortPeriod[ch]:'+VarAnalogOutPortPeriod[ch]); 
+	//console.log('VarAnalogOutPortWidth[ch]:'+VarAnalogOutPortWidth[ch]); 
 	   
 	VarAnalogOutPortPeriod[ch]=period;
 	VarAnalogOutPortWidth[ch]=tmp;
@@ -292,7 +292,7 @@
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', 50 , 20 ,'PWM1']
+            [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
