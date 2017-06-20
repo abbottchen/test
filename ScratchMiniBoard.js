@@ -105,11 +105,12 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	console.log('device send'+txbuf.buffer);
 	for(var i=0;i<14;i++)
 	{
-		console.log(txbuf[i]);	
+		console.log(txbuf[i]);
+		device.send(txbuf[i].buffer);
 	}
-	var output = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);
-    	device.send(output.buffer);
-	device.send(txbuf.buffer);	
+	//var output = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);
+    	//device.send(output.buffer);
+	//device.send(txbuf.buffer);	
     }
 	
     //设置工作模式
