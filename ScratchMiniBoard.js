@@ -46,42 +46,84 @@
         'PWM1': 0,
         'PWM2': 0
    };
-  /*
+/*
+typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
+{	
+	uint8	Head;
+	uint8	Len:4;
+	uint8	Ver:3;
+	uint8	Direction:1;
+        uint8   D0MODE:1;
+        uint8   D1MODE:1;       //0 输入  1输出
+        uint8   D2MODE:1;       //
+        uint8   D3MODE:1;
+        uint8   D4MODE:1;
+        uint8   D5MODE:1;
+        uint8	Reserve1:2;
+        
+        uint8   D0LEVEL:1;
+        uint8   D1LEVEL:1;       //0低  1高
+        uint8   D2LEVEL:1;       //
+        uint8   D3LEVEL:1;
+        uint8   D4LEVEL:1;
+        uint8   D5LEVEL:1;
+        uint8	Reserve2:2;       
+        
+        
+        uint16  PWM1_PERIOD;
+        uint16  PWM1_WIDTH;
+        uint16  PWM2_PERIOD;
+        uint16  PWM2_WIDTH;
+	uint8	CS;
+	uint8	End;
+}STRUCT_SCRATCH_CONTROL_BOARD_IN;
+*/
+
+   function SendFrameToUart()
+   {
+	var txbuf = new Uint8Array(14);	
+	txbuf[0]=0xaa;
+	txbuf[1]=0x0a|0x10;   
+	txbuf[2]=0;		//mode
+	txbuf[3]=0;		//level		
+	txbuf[4]=0;		//pwm1
+	txbuf[5]=0;
+	txbuf[6]=0;
+	txbuf[7]=0;
+	txbuf[8]=0;		//pwm2
+	txbuf[9]=0;
+	txbuf[10]=0;   
+	txbuf[11]=0;
+	   
+	var Sum=0;
+	for(var i=0;i<12;i++){	
+		Sum=Sum+txbuf[i];
+	}
+	txbuf[12]=Sum%256; 	
+	txbuf[13]=0x16	
+	device.send(txbuf.buffer);	
+    }
+	
     //设置工作模式
-    function SetDigitIoPortMode(which,Mode) {
-        DigitIoPortMode[which]=Mode; 
+    function SetDigitIoPortMode(which,mode) {
+        VarDigitIoPortMode[which]=mode; 
+	SendFrameToUart();    
     }
-    
+    ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
+	
    function SetDigitIoPortLevel(which,level) {
-        DigitIoPortLevel[which]=level; 
+        VarDigitIoPortLevel[which]=level; 
+	SendFrameToUart();   
     }
-*/	
+   ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
+
+	
 	
 	
     function getSensor(which) {
         return inputs[which];
     }
 	
-    /*
-    typedef struct STRUCT_SCRATCH_CONTROL_BOARD_OUT		//
-{	
-        uint8	D0:1;
-	uint8	D1:1; 
-	uint8	D2:1; 
-	uint8	D3:1; 
-	uint8	D4:1; 
-	uint8	D5:1;    
-	uint8	Reserve1:2;             
-	uint8	ADCPort1;
-	uint8	ADCPort2;
-	uint8	ADCPort3;
-	uint8	ADCPort1HBit:2;
-	uint8	ADCPort2HBit:2;
-	uint8	ADCPort3HBit:2;
-        uint8	Reserve2:2;              
-}STRUCT_SCRATCH_CONTROL_BOARD_OUT;
-*/
-
     function getSensorFromFrame(Frame){
 	inputs['D1']=(Frame[2]>>0)&0x01;
 	inputs['D2']=(Frame[2]>>1)&0x01;    
@@ -178,11 +220,11 @@
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 	    var rawData = new Uint8Array(data);	
-	    console.log('Received size' + data.byteLength);	
+	    //console.log('Received size' + data.byteLength);	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-		console.log(rawData[i]);
+		//console.log(rawData[i]);
 		GetFrame(rawData[i]);  
             }
         });
@@ -198,7 +240,7 @@
     ext.resetAll = function(){};	
 
     ext.sensor = function(which) { return getSensor(which); };	
-	
+		
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
         device = null;
@@ -217,8 +259,8 @@
 
     var descriptor = {
         blocks: [
-            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'sensor', 'D1', '输入'],
-            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'sensor', '低', 'D1'],
+            [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
+            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'sensor', 0,0,'PWM1']
