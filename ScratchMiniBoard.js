@@ -107,7 +107,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	{
 		console.log(txbuf[i]);	
 	}
-	var tmp = new ArrayBuffer(txbuf);
+	var tmp = new ArrayBuffer(txbuf.buffer);
 	console.log('device send len'+tmp.byteLength);   
 	device.send(tmp);	
     }
