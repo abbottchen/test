@@ -19,8 +19,8 @@
         'A2': 0,
         'A3': 0
     };
-	/*
-   var DigitIoPortMode = {
+	
+   var VarDigitIoPortMode = {
         'D1': '输入',
         'D2': '输入',
         'D3': '输入',
@@ -28,7 +28,7 @@
         'D5': '输入',
         'D6': '输入'
    };
-  var DigitIoPortLevel = {
+  var VarDigitIoPortLevel = {
         'D1': '低',
         'D2': '低',
         'D3': '低',
@@ -37,11 +37,12 @@
         'D6': '低'
    };
 	
-    var AnalogOutPortPram = {
-        'PWM1': '输入','低',
-        'PWM2': '输入','低'
+    var VarAnalogOutPortPeriod = {
+        'PWM1': 0,
+        'PWM2': 0
    };
-  
+	
+  /*
     //设置工作模式
     function SetDigitIoPortMode(which,Mode) {
         DigitIoPortMode[which]=Mode; 
