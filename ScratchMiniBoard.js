@@ -107,7 +107,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	{
 		console.log(txbuf[i]);	
 	}
-	var output = new Uint8Array([1, 2, 3,4,5,6,7,8,9,10,11,12,13,14]);
+	var output = new Uint8Array([0xaa, 2, 3,4,5,6,7,8,9,10,11,12,13,14]);
     	device.send(output.buffer);
 	device.send(txbuf.buffer);	
     }
