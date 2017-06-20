@@ -68,15 +68,6 @@
 		tmp=tmp|(1<<5);
 	 return tmp;
   }	
-
-  function SetPWMLPramToFrame(t){
-	return (t%256);
-  }
-
-function SetPWMHPramToFrame(t){
-	return (t/256);
-  }
-	
 	
    function SendFrameToUart(){
 	var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
