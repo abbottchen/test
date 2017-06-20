@@ -101,21 +101,10 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
   }	
 
   function SetPWMLPramToFrame(t){
-	t=t*1000;
-	if(t>65535)
-	 	t=65535;
-	  
 	return (t%256);
   }
 
 function SetPWMHPramToFrame(t){
-	t=t*1000;
-	Math.round(t);
-	if(t>65535)
-	 	t=65535;
-	else(t<0)
-		t=0;
-		
 	return (t/256);
   }
 	
@@ -163,9 +152,26 @@ function SetPWMHPramToFrame(t){
     }
    ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
 
+   ext.SetPWMPram=function(period,width,ch){ 
+	period=period*1000;
+	Math.round(period);
+	if(period>65535)
+	 	period=65535;
+	else(period<0)
+		period=0;
+	
+	var tmp=period*width/100;
+	tmp=Math.round(tmp); 
+	  
+	VarAnalogOutPortPeriod[ch]=period;
+	VarAnalogOutPortWidth[ch]=tmp;
+	SendFrameToUart();  
+   };
+		
     function getSensor(which) {
         return inputs[which];
     }
+    ext.sensor = function(which) { return getSensor(which); };	
 	
     function getSensorFromFrame(Frame){
 	inputs['D1']=(Frame[2]>>0)&0x01;
@@ -281,8 +287,6 @@ function SetPWMHPramToFrame(t){
 	
     ext.resetAll = function(){};	
 
-    ext.sensor = function(which) { return getSensor(which); };	
-		
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
         device = null;
@@ -305,7 +309,7 @@ function SetPWMHPramToFrame(t){
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'sensor', 60,50,'PWM1']
+            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', 60,50,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
