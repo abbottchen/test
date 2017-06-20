@@ -81,19 +81,19 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 
    function SendFrameToUart()
    {
-	var txbuf = new Uint8Array(14);	
+	var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
 	txbuf[0]=0xaa;
 	txbuf[1]=0x0a|0x10;   
-	txbuf[2]=0;		//mode
-	txbuf[3]=0;		//level		
-	txbuf[4]=0;		//pwm1
-	txbuf[5]=0;
-	txbuf[6]=0;
-	txbuf[7]=0;
-	txbuf[8]=0;		//pwm2
-	txbuf[9]=0;
-	txbuf[10]=0;   
-	txbuf[11]=0;
+	txbuf[2]=0x00;		//mode
+	txbuf[3]=0x00;		//level		
+	txbuf[4]=0x00;		//pwm1
+	txbuf[5]=0x00;
+	txbuf[6]=0x00;
+	txbuf[7]=0x00;
+	txbuf[8]=0x00;		//pwm2
+	txbuf[9]=0x00;
+	txbuf[10]=0x00;   
+	txbuf[11]=0x00;
 	   
 	var Sum=0;
 	for(var i=0;i<12;i++){	
@@ -107,7 +107,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	{
 		console.log(txbuf[i]);	
 	}
-	var output = new Uint8Array([0xaa, 2, 3,4,5,6,7,8,9,10,11,12,13,14]);
+	var output = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);
     	device.send(output.buffer);
 	device.send(txbuf.buffer);	
     }
