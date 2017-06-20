@@ -78,42 +78,62 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	uint8	End;
 }STRUCT_SCRATCH_CONTROL_BOARD_IN;
 */
-  function SetDigitIoPortModeToFrame(){	
+  function SetDigitIoPortToFrame(prm,st){	
 	var tmp=0x00;		//mode   
-	if(VarDigitIoPortMode['D1']=='输出')
+	if(prm['D1']==st)
 		tmp=tmp|(1<<0);
 	   
-	if(VarDigitIoPortMode['D2']=='输出')
+	if(prm['D2']==st)
 		tmp=tmp|(1<<1);
 	 
-	if(VarDigitIoPortMode['D3']=='输出')
+	if(prm['D3']==st)
 		tmp=tmp|(1<<2);
 	  
-	if(VarDigitIoPortMode['D4']=='输出')
+	if(prm['D4']==st)
 		tmp=tmp|(1<<3);
 	  
-	if(VarDigitIoPortMode['D5']=='输出')
+	if(prm['D5']==st)
 		tmp=tmp|(1<<4);
 	  
-	if(VarDigitIoPortMode['D6']=='输出')
+	if(prm['D6']==st)
 		tmp=tmp|(1<<5);
 	 return tmp;
   }	
+
+  function SetPWMLPramToFrame(t){
+	t=t*1000;
+	if(t>65535)
+	 	t=65535;
+	  
+	return (t%256);
+  }
+
+function SetPWMHPramToFrame(t){
+	t=t*1000;
+	Math.round(t);
+	if(t>65535)
+	 	t=65535;
+	else(t<0)
+		t=0;
+		
+	return (t/256);
+  }
+	
 	
    function SendFrameToUart(){
 	var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
 	txbuf[0]=0xaa;
 	txbuf[1]=0x0a|0x10;   
-	txbuf[2]=SetDigitIoPortModeToFrame();
-	txbuf[3]=0x00;		//level		
-	txbuf[4]=0x00;		//pwm1
-	txbuf[5]=0x00;
-	txbuf[6]=0x00;
-	txbuf[7]=0x00;
-	txbuf[8]=0x00;		//pwm2
-	txbuf[9]=0x00;
-	txbuf[10]=0x00;   
-	txbuf[11]=0x00;
+	txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode,'输出');
+	txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel,'高');	
+	txbuf[4]=SetPWMLPramToFrame(VarAnalogOutPortPeriod['PWM1']);		//pwm1
+	txbuf[5]=SetPWMHPramToFrame(VarAnalogOutPortPeriod['PWM1']);
+	txbuf[6]=SetPWMLPramToFrame(VarAnalogOutPortWidth['PWM1']);
+	txbuf[7]=SetPWMHPramToFrame(VarAnalogOutPortWidth['PWM1']);
+	txbuf[8]=SetPWMLPramToFrame(VarAnalogOutPortPeriod['PWM2']);		//pwm2
+	txbuf[9]=SetPWMHPramToFrame(VarAnalogOutPortPeriod['PWM2']);
+	txbuf[10]=SetPWMLPramToFrame(VarAnalogOutPortWidth['PWM2']);   
+	txbuf[11]=SetPWMHPramToFrame(VarAnalogOutPortWidth['PWM2']);
 	   
 	var Sum=0;
 	for(var i=0;i<12;i++){	
@@ -127,10 +147,7 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	{
 		console.log(txbuf[i]);
 		device.send(new Uint8Array([txbuf[i]]).buffer);
-	}
-	//var output = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);
-    	//device.send(output.buffer);
-	//device.send(txbuf.buffer);	
+	}	
     }
 	
     //设置工作模式
