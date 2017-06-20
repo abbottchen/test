@@ -118,7 +118,11 @@
     }
    ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
 
-   ext.SetPWMPram=function(period,width,ch){ 
+   function SetPWMToPram(period,width,ch){ 
+	console.log('ch:'+ch);    
+	console.log('period:'+period);   
+	console.log('Width:'+width);
+	   
 	period=period*1000;
 	Math.round(period);
 	if(period>65535)
@@ -140,11 +144,12 @@
 	VarAnalogOutPortWidth[ch]=tmp;
 	SendFrameToUart();  
    };
-		
+   ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
+	
     function getSensor(which) {
         return inputs[which];
     }
-    ext.sensor = function(which) { return getSensor(which); };	
+    ext.sensor = function(period,width,ch) { return getSensor(which); };	
 	
     function getSensorFromFrame(Frame){
 	inputs['D1']=(Frame[2]>>0)&0x01;
@@ -282,7 +287,7 @@
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', '20','30','PWM1']
+            [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', 20 , 23 ,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
