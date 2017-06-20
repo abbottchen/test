@@ -78,13 +78,33 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	uint8	End;
 }STRUCT_SCRATCH_CONTROL_BOARD_IN;
 */
-
-   function SendFrameToUart()
-   {
+  function SetDigitIoPortModeToFrame(){	
+	var tmp=0x00;		//mode   
+	if(VarDigitIoPortMode['D1']=='输出')
+		tmp=tmp|(1<<0);
+	   
+	if(VarDigitIoPortMode['D2']=='输出')
+		tmp=tmp|(1<<1);
+	 
+	if(VarDigitIoPortMode['D3']=='输出')
+		tmp=tmp|(1<<2);
+	  
+	if(VarDigitIoPortMode['D4']=='输出')
+		tmp=tmp|(1<<3);
+	  
+	if(VarDigitIoPortMode['D5']=='输出')
+		tmp=tmp|(1<<4);
+	  
+	if(VarDigitIoPortMode['D6']=='输出')
+		tmp=tmp|(1<<5);
+	 return tmp;
+  }	
+	
+   function SendFrameToUart(){
 	var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
 	txbuf[0]=0xaa;
 	txbuf[1]=0x0a|0x10;   
-	txbuf[2]=0x00;		//mode
+	txbuf[2]=SetDigitIoPortModeToFrame();
 	txbuf[3]=0x00;		//level		
 	txbuf[4]=0x00;		//pwm1
 	txbuf[5]=0x00;
