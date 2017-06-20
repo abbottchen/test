@@ -5,7 +5,7 @@
     var device = null;
 
     var	FrameStep=0;
-    var FrameBuf= new Uint8Array(300);
+    var FrameBuf= new Uint8Array(100);
     var DataLen=0;
 	
     var inputs = {
