@@ -179,10 +179,10 @@
 			getSensorFromFrame(FrameBuf);
 	    	}
 	        else{
-			FrameStep=0;
-			DataLen=0;
 			console.log('结束符错误'+ch);
-		}	
+		}
+		FrameStep=0;
+		DataLen=0;
 	}
     }
 
