@@ -37,11 +37,15 @@
         'D6': '低'
    };
 	
-    var VarAnalogOutPortPeriod = {
+   var VarAnalogOutPortPeriod = {
         'PWM1': 0,
         'PWM2': 0
    };
 	
+   var VarAnalogOutPortWidth = {
+        'PWM1': 0,
+        'PWM2': 0
+   };
   /*
     //设置工作模式
     function SetDigitIoPortMode(which,Mode) {
@@ -51,38 +55,6 @@
    function SetDigitIoPortLevel(which,level) {
         DigitIoPortLevel[which]=level; 
     }
-
-	typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
-{	
-	uint8	Head;
-	uint8	Len:4;
-	uint8	Ver:3;
-	uint8	Direction:1;
-	uint8	PIN7MODE:2;	//D6
-	uint8	PIN8MODE:2;	//PWM2
-	uint8	PIN9MODE:3;	//PWM1
-	uint8	PIN10MODE:2;	//D5
-	uint8	PIN11MODE:1;	//D4
-	uint8	PIN12MODE:1;	//D3
-	uint8	PIN17MODE:1;	//D1
-	uint8	PIN18MODE:1;	//NC
-	uint8	PIN19MODE:1;	//NC
-	uint8	PIN20MODE:1;	//D2
-	uint8	Reserve1:1;
-	uint8	PIN7WorkPram;
-	uint8	PIN8WorkPram;
-	uint8	PIN9WorkPram[3];
-	uint8	PIN10WorkPram;
-	uint8	PIN11OutputLevel:1;
-	uint8	PIN12OutputLevel:1;
-	uint8	PIN17OutputLevel:1;
-	uint8	PIN18OutputLevel:1;
-	uint8	PIN19OutputLevel:1;
-	uint8	PIN20OutputLevel:1;
-	uint8	Reserve2:2;
-	uint8	CS;
-	uint8	End;
-}STRUCT_SCRATCH_CONTROL_BOARD_IN;
 */	
 	
 	
@@ -249,7 +221,7 @@
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'sensor', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms(周期),占空比 %n (0~100%) 信号到模拟输出脚 %m.AnalogIOName', 'sensor', 0,0,'PWM1']
+            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'sensor', 0,0,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
