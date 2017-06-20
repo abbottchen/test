@@ -19,6 +19,7 @@
         'A2': 0,
         'A3': 0
     };
+	/*
    var DigitIoPortMode = {
         'D1': '输入',
         'D2': '输入',
@@ -49,7 +50,7 @@
    function SetDigitIoPortLevel(which,level) {
         DigitIoPortLevel[which]=level; 
     }
-/*
+
 	typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 {	
 	uint8	Head;
