@@ -107,9 +107,9 @@ typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
 	{
 		console.log(txbuf[i]);	
 	}
-	var tmp = new ArrayBuffer(txbuf.buffer);
-	console.log('device send len'+tmp.byteLength);   
-	device.send(tmp);	
+	var output = new Uint8Array([1, 2, 3,4,5,6,7,8,9,10,11,12,13,14]);
+    	device.send(output.buffer);
+	device.send(txbuf.buffer);	
     }
 	
     //设置工作模式
