@@ -21,20 +21,20 @@
     };
 	
    var VarDigitIoPortMode = {
-        'D1': '输入',
-        'D2': '输入',
-        'D3': '输入',
-        'D4': '输入',
-        'D5': '输入',
-        'D6': '输入'
+        'D1': 0,
+        'D2': 0,
+        'D3': 0,
+        'D4': 0,
+        'D5': 0,
+        'D6': 0
    };
   var VarDigitIoPortLevel = {
-        'D1': '低',
-        'D2': '低',
-        'D3': '低',
-        'D4': '低',
-        'D5': '低',
-        'D6': '低'
+        'D1': 0,
+        'D2': 0,
+        'D3': 0,
+        'D4': 0,
+        'D5': 0,
+        'D6': 0
    };
 	
    var VarAnalogOutPortPeriod = {
@@ -47,24 +47,24 @@
         'PWM2': 0
    };
 
-  function SetDigitIoPortToFrame(prm,st){	
+  function SetDigitIoPortToFrame(prm){	
 	var tmp=0x00;		//mode   
-	if(prm['D1']==st)
+	if(prm['D1'])
 		tmp=tmp|(1<<0);
 	   
-	if(prm['D2']==st)
+	if(prm['D2'])
 		tmp=tmp|(1<<1);
 	 
-	if(prm['D3']==st)
+	if(prm['D3'])
 		tmp=tmp|(1<<2);
 	  
-	if(prm['D4']==st)
+	if(prm['D4'])
 		tmp=tmp|(1<<3);
 	  
-	if(prm['D5']==st)
+	if(prm['D5'])
 		tmp=tmp|(1<<4);
 	  
-	if(prm['D6']==st)
+	if(prm['D6'])
 		tmp=tmp|(1<<5);
 	 return tmp;
   }	
@@ -73,8 +73,8 @@
 	var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
 	txbuf[0]=0xaa;
 	txbuf[1]=0x0a|0x10;   
-	txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode,'输出');
-	txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel,'高');	
+	txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode);
+	txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
 	txbuf[4]=VarAnalogOutPortPeriod['PWM1']%256;		//pwm1
 	txbuf[5]=VarAnalogOutPortPeriod['PWM1']/256;
 	txbuf[6]=VarAnalogOutPortWidth['PWM1']%256;
@@ -101,14 +101,20 @@
 	
     //设置工作模式
     function SetDigitIoPortMode(which,mode) {
-        VarDigitIoPortMode[which]=mode; 
+	if(mode=='输出')
+        	VarDigitIoPortMode[which]=1; 
+	else
+		VarDigitIoPortMode[which]=0; 
 	SendFrameToUart();    
     }
     ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
 	
    function SetDigitIoPortLevel(which,level) {
-        VarDigitIoPortLevel[which]=level; 
-	SendFrameToUart();   
+	if(level=='高')
+        	VarDigitIoPortLevel[which]=1; 
+	else
+		VarDigitIoPortLevel[which]=0; 
+	SendFrameToUart();  
     }
    ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
 
