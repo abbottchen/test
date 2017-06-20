@@ -88,14 +88,34 @@
     function getSensor(which) {
         return inputs[which];
     }
-    
+	
+    /*
+    typedef struct STRUCT_SCRATCH_CONTROL_BOARD_OUT		//
+{	
+        uint8	D0:1;
+	uint8	D1:1; 
+	uint8	D2:1; 
+	uint8	D3:1; 
+	uint8	D4:1; 
+	uint8	D5:1;    
+	uint8	Reserve1:2;             
+	uint8	ADCPort1;
+	uint8	ADCPort2;
+	uint8	ADCPort3;
+	uint8	ADCPort1HBit:2;
+	uint8	ADCPort2HBit:2;
+	uint8	ADCPort3HBit:2;
+        uint8	Reserve2:2;              
+}STRUCT_SCRATCH_CONTROL_BOARD_OUT;
+*/
+
     function getSensorFromFrame(Frame){
-	inputs['D1']=(Frame[2]>>6)&0x01;
-	inputs['D2']=(Frame[6]>>8)&0x01;    
-    	inputs['D3']=(Frame[2]>>5)&0x01;
-	inputs['D4']=(Frame[2]>>4)&0x01;
-	inputs['D5']=(Frame[2]>>3)&0x01;
-	inputs['D6']=(Frame[2]>>0)&0x01;
+	inputs['D1']=(Frame[2]>>0)&0x01;
+	inputs['D2']=(Frame[2]>>1)&0x01;    
+    	inputs['D3']=(Frame[2]>>2)&0x01;
+	inputs['D4']=(Frame[2]>>3)&0x01;
+	inputs['D5']=(Frame[2]>>4)&0x01;
+	inputs['D6']=(Frame[2]>>5)&0x01;
 	    
 	var tmp=0;
 	tmp=Frame[3]+(Frame[6]&0x03)*256; 
