@@ -46,38 +46,7 @@
         'PWM1': 0,
         'PWM2': 0
    };
-/*
-typedef struct STRUCT_SCRATCH_CONTROL_BOARD_IN		//
-{	
-	uint8	Head;
-	uint8	Len:4;
-	uint8	Ver:3;
-	uint8	Direction:1;
-        uint8   D0MODE:1;
-        uint8   D1MODE:1;       //0 输入  1输出
-        uint8   D2MODE:1;       //
-        uint8   D3MODE:1;
-        uint8   D4MODE:1;
-        uint8   D5MODE:1;
-        uint8	Reserve1:2;
-        
-        uint8   D0LEVEL:1;
-        uint8   D1LEVEL:1;       //0低  1高
-        uint8   D2LEVEL:1;       //
-        uint8   D3LEVEL:1;
-        uint8   D4LEVEL:1;
-        uint8   D5LEVEL:1;
-        uint8	Reserve2:2;       
-        
-        
-        uint16  PWM1_PERIOD;
-        uint16  PWM1_WIDTH;
-        uint16  PWM2_PERIOD;
-        uint16  PWM2_WIDTH;
-	uint8	CS;
-	uint8	End;
-}STRUCT_SCRATCH_CONTROL_BOARD_IN;
-*/
+
   function SetDigitIoPortToFrame(prm,st){	
 	var tmp=0x00;		//mode   
 	if(prm['D1']==st)
@@ -115,14 +84,14 @@ function SetPWMHPramToFrame(t){
 	txbuf[1]=0x0a|0x10;   
 	txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode,'输出');
 	txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel,'高');	
-	txbuf[4]=SetPWMLPramToFrame(VarAnalogOutPortPeriod['PWM1']);		//pwm1
-	txbuf[5]=SetPWMHPramToFrame(VarAnalogOutPortPeriod['PWM1']);
-	txbuf[6]=SetPWMLPramToFrame(VarAnalogOutPortWidth['PWM1']);
-	txbuf[7]=SetPWMHPramToFrame(VarAnalogOutPortWidth['PWM1']);
-	txbuf[8]=SetPWMLPramToFrame(VarAnalogOutPortPeriod['PWM2']);		//pwm2
-	txbuf[9]=SetPWMHPramToFrame(VarAnalogOutPortPeriod['PWM2']);
-	txbuf[10]=SetPWMLPramToFrame(VarAnalogOutPortWidth['PWM2']);   
-	txbuf[11]=SetPWMHPramToFrame(VarAnalogOutPortWidth['PWM2']);
+	txbuf[4]=VarAnalogOutPortPeriod['PWM1']%256;		//pwm1
+	txbuf[5]=VarAnalogOutPortPeriod['PWM1']/256;
+	txbuf[6]=VarAnalogOutPortWidth['PWM1']%256;
+	txbuf[7]=VarAnalogOutPortWidth['PWM1']/256;
+	txbuf[8]=VarAnalogOutPortPeriod['PWM2']%256;		//pwm2
+	txbuf[9]=VarAnalogOutPortPeriod['PWM2']/256;
+	txbuf[10]=VarAnalogOutPortWidth['PWM2']%256;   
+	txbuf[11]=VarAnalogOutPortWidth['PWM2']/256;
 	   
 	var Sum=0;
 	for(var i=0;i<12;i++){	
@@ -159,10 +128,17 @@ function SetPWMHPramToFrame(t){
 	 	period=65535;
 	else(period<0)
 		period=0;
-	
+	   
 	var tmp=period*width/100;
 	tmp=Math.round(tmp); 
-	  
+	   
+	console.log('ch:'+ch);    
+	console.log('period:'+period);   
+	console.log('Width:'+tmp);   
+	
+	console.log('VarAnalogOutPortPeriod[ch]:'+VarAnalogOutPortPeriod[ch]); 
+	console.log('VarAnalogOutPortWidth[ch]:'+VarAnalogOutPortWidth[ch]); 
+	   
 	VarAnalogOutPortPeriod[ch]=period;
 	VarAnalogOutPortWidth[ch]=tmp;
 	SendFrameToUart();  
@@ -309,7 +285,7 @@ function SetPWMHPramToFrame(t){
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚 值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', 20,50,'PWM1']
+            [' ', '输出 %n ms的周期,%n (0~100%)占空比的信号到模拟输出脚 %m.AnalogIOName', 'SetPWMPram', 20,49,'PWM1']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
