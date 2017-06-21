@@ -350,48 +350,6 @@ function fetchLeiweiData(appid, callback) {
     	});
 }    
 
-function GetLeiweiValue(json , device, sensortype, sensorname) {
-	/*
-	var i=0
-	console.log('设备数量:'+json.length); 
-        for(i=0;i<json.length;i++){
-		console.log('设备名称:'+json[i].name);
-		if(json[i].name!=device){
-			break;
-		}
-	}
-	if(i>=json.length)
-		return null;
-	
-	if(sensortype=='传感器'）
-	{
-		var Num=json[i].sensors.length;
-		console.log('传感器数量:'+Num);
-		for(var j=0;j<Num;j++){
-			console.log('传感器名称:'+json[i].sensors[j].name);
-			if(json[i].sensors[j].name==sensorname){
-				return json[i].sensors[j].value;
-			}
-        	 }
-	}
-	return null;
-	
-			
-			
-		
-		else if(sensortype=='控制器'）
-		{
-		   Num=json[i].sensors.length;
-		   for(var j=0;j<Num;j++){
-			console.log('控制器名称:'+json[i].controllers[j].name);
-			if(json[i].controllers[j].name==sensorname){
-				return json[i].sensors[j].value;
-			}
-        	   }
-		}
-        }*/
-	return 0;
-}
 	
 function GetLeiweiDevice(json , device) {
 	for(var i=0;i<json.length;i++){
@@ -419,9 +377,8 @@ function GetLeiweiSensor(json , sensorname) {
 	  var jsondevice=GetLeiweiDevice(data,device);
 	  console.log('GetLeiweiDevice返回设备名称:'+jsondevice);
 	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorname)
-	  console.log('GetLeiweiSensor返回的传感器:'+jsonSensor); 
-      	  //var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
-	  var val=0;
+	  console.log('GetLeiweiSensor返回的传感器值:'+jsonSensor.value); 
+	  var val=jsonSensor.value;
       	callback(val);
     });
   };
