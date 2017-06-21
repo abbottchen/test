@@ -400,7 +400,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 10 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
 	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],
-	    ['R', '获取乐为物联APPID %n 设备名称 %n  %m.SensorType 名称 %n 的值','GetLewei', '0000' ,'01' ,'传感器', '222']
+	    ['R', '获取乐为物联APPID %n 设备名称 %n  %m.SensorType 名称 %n 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'01' ,'传感器', '222']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
