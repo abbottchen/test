@@ -397,6 +397,22 @@ function GetLeiweiControl(json , sensorname) {
       	callback(val);
     });
   };
+	
+function PostLeiweiData(appid, callback) {
+    	// Make an AJAX call to the Open Weather Maps API
+    	$.ajax({ 
+      		url: 'http://www.lewei50.com/api/V1/gateway/UpdateSensors/'+'01',
+     		data: {userkey: appid},
+     		type: 'post',
+     		dataType: 'jsonp',
+      		success: function(LeiweiData) {
+			console.log('ajax返回数据:'+LeiweiData); 
+			callback(LeiweiData);
+      		}
+    	});
+}
+	
+	
 /******************************************************/
     var descriptor = {
         blocks: [
