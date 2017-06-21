@@ -276,33 +276,20 @@
     var cacheDuration = 1800000 //ms, 30 minutes
     var cachedTemps = {};
 
-    var units = 'imperial';
-	
-    
     function getWeatherData(weatherData, type) {
     var val = null;
+    console.log('温度:'+weatherData.main.temp);  
+    console.log('湿度:'+weatherData.main.humidity);
+    console.log('风速:'+weatherData.main.speed);     
     switch (type) {
-      case 'temperature':
+      case '温度':
         val = weatherData.main.temp;
-        if (units === 'metric')
-          val = (val - 32) * (5/9)
-        val = Math.round(val);
         break;
-      case 'weather':
-        val = weatherData.weather[0].description;
-        break;
-      case 'humidity':
+      case '湿度':
         val = weatherData.main.humidity;
         break;
-      case 'wind speed':
+      case '风速':
         val = weatherData.wind.speed;
-        if (units === 'imperial')
-          val *= 2.23694;
-        if (Math.round(val) !== val)
-          val = val.toFixed(1);
-        break;
-      case 'cloudiness':
-        val = weatherData.clouds.all;
         break;
     }
     return(val);
@@ -313,15 +300,17 @@
         	Date.now() - cachedTemps[location].time < cacheDuration) {
       		//Weather data is cached
       		callback(cachedTemps[location].data);
+		console.log('取缓冲区:'+cachedTemps[location].data); 
       		return;
     	}
 
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({
       		url: 'http://api.openweathermap.org/data/2.5/weather',
-     		 data: {q: location, units: 'imperial', appid: '960f7f58abbc5c98030d1899739c1ba8'},
+     		 data: {q: location, units: 'metric', appid: '960f7f58abbc5c98030d1899739c1ba8'},
       		dataType: 'jsonp',
       		success: function(weatherData) {
+		console.log('ajax获取数据:'+weatherData); 	
         	//Received the weather data. Cache and return the data.
         	cachedTemps[location] = {data: weatherData, time: Date.now()};
         	callback(weatherData);
@@ -348,7 +337,7 @@
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
-	    ['r', '%m.WeatherDataType in %s', 'getWeather', 'temperature', 'Boston, MA'],	
+	    ['r', '%m.WeatherDataType in %s', 'getWeather', '温度', 'Boston, MA'],	
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
@@ -356,7 +345,7 @@
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['temperature', 'weather', 'humidity', 'wind speed', 'cloudiness']
+	    WeatherDataType:['温度', '湿度', '风速']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
