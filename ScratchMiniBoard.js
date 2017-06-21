@@ -349,7 +349,7 @@ function fetchLeiweiData(appid, callback) {
       		}
     	});
 }    
-
+/*
 function GetLeiweiValue(json , device, sensortype, sensorname) {
 	var DeviceNum=json.length;
 	var Num=0;
@@ -369,7 +369,6 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 			}
         	   }
 		}
-	/*
 		else if(sensortype=='控制器'）
 		{
 		   Num=json[i].sensors.length;
@@ -379,14 +378,15 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 				return json[i].sensors[j].value;
 			}
         	   }
-		}*/
+		}
         }
 	return null;
-}
+}*/
  
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData('da34db80af9c46669159fe8982bbdbe0', function(data) {
-      	var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
+      	//var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
+	    var val=0;
       	callback(val);
     });
   };
