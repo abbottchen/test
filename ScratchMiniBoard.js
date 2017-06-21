@@ -336,7 +336,6 @@
   };
 /******************************************************/ 
 /******************************************************/  
-	/*
 function fetchLeiweiData(appid, callback) {
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({ 
@@ -384,7 +383,6 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
       	callback(val);
     });
   };
-*/
 /******************************************************/
     var descriptor = {
         blocks: [
