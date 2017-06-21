@@ -292,7 +292,8 @@
         	val = weatherData.wind.speed;
         break;
    	}
-    	return(val);
+	console.log('getWeatherDataFromJSOP'+val);  
+    	return val;
   }
     
      function fetchWeatherData(location) {
