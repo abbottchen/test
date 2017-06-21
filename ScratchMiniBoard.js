@@ -313,10 +313,9 @@
 		console.log('ajax获取数据:'+weatherData); 	
         	//Received the weather data. Cache and return the data.
         	cachedTemps[location] = {data: weatherData, time: Date.now()};
-		return weatherData;
       		}
     	});
-	 return null;
+	return cachedTemps[location].data;
      }
     
     function GetWeatherData(type, location){
