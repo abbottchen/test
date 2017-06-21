@@ -1,1 +1,39 @@
-{"Ret":1,"Name":"T1","Value":"1"}
+[
+   {
+      "id": 27793,
+      "idName": "01",						
+      "templateName": "",
+      "no": null,
+      "name": "默认网关",					
+      "typeName": "other",
+      "description": null,
+      "position": null,
+      "isPublic": true,
+      "isControlled": false,
+      "internetAvailable": false,
+      "internetIPAddress": null,
+      "apiAddress": null,
+      "apiAddressInternet": "",
+      "version": null,
+      "modbusSlaveId": null,
+      "modbusFunc": null,
+      "interval": null,
+      "sensors": [
+         {
+            "name": "湿度",					
+            "value": "88",					
+            "id": 47250,	
+            "idName": "Humidity",			
+            "type": "HUMI",
+            "typeName": "湿度监控",
+            "unit": "%",
+            "description": null,
+            "lastUpdateTime": "2017-04-21 12:25",
+            "isOnline": false,
+            "isError": false,
+            "isAlarm": false
+         }
+      ],
+      "controllers": []
+   }
+]
