@@ -384,11 +384,15 @@ function GetLeiweiControl(json , sensorname) {
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData(appid, function(data) { 
 	  var jsondevice=GetLeiweiDevice(data,device);
-	  if(null==jsondevice)
+	  if(null==jsondevice){
 		callback(null);
+		return;
+	  }
 	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorname)
-	  if(null==jsonSensor)
+	  if(null==jsonSensor){
 		callback(null);
+		return;
+	  }
 	  var val=jsonSensor.value;
       	callback(val);
     });
