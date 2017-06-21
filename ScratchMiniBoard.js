@@ -392,10 +392,22 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
         }*/
 	return 0;
 }
- 
+	
+function GetLeiweiDevice(json , device) {
+	for(var i=0;i<json.length;i++){
+		console.log('设备名称:'+json[i].name);
+		if(json[i].name==device){
+			return json[i];
+		}
+	}
+	return null;
+ }
+	
+	
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData(appid, function(data) {
 	  console.log('设备数量:'+data.length);  
+	  var jsondevice=GetLeiweiDevice(data,device);
       	  //var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
 	  var val=0;
       	callback(val);
@@ -411,7 +423,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
 	    ['R', '%s %m.WeatherDataType 值 ', 'getWeather', 'Beijing', '温度'],
-	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'02' ,'传感器', '222']
+	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban2' ,'传感器', '222']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
