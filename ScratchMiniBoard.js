@@ -369,6 +369,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 			}
         	   }
 		}
+	/*
 		else if(sensortype=='控制器'）
 		{
 		   Num=json[i].sensors.length;
@@ -378,8 +379,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 				return json[i].sensors[j].value;
 			}
         	   }
-		}
-		return null;
+		}*/
         }
 	return null;
 }
