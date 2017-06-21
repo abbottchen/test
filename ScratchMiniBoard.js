@@ -268,11 +268,78 @@
     };
 
     ext._getStatus = function() {
-        if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
-        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+        //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
+        //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
         return {status: 2, msg: 'ScratchMiniBoard connected'};
     }
+    /******************************************************/
+    var cacheDuration = 1800000 //ms, 30 minutes
+    var cachedTemps = {};
 
+    var units = 'imperial';
+	
+    
+    function getWeatherData(weatherData, type) {
+    var val = null;
+    switch (type) {
+      case 'temperature':
+        val = weatherData.main.temp;
+        if (units === 'metric')
+          val = (val - 32) * (5/9)
+        val = Math.round(val);
+        break;
+      case 'weather':
+        val = weatherData.weather[0].description;
+        break;
+      case 'humidity':
+        val = weatherData.main.humidity;
+        break;
+      case 'wind speed':
+        val = weatherData.wind.speed;
+        if (units === 'imperial')
+          val *= 2.23694;
+        if (Math.round(val) !== val)
+          val = val.toFixed(1);
+        break;
+      case 'cloudiness':
+        val = weatherData.clouds.all;
+        break;
+    }
+    return(val);
+  }
+    
+     function fetchWeatherData(location, callback) {
+    	if (location in cachedTemps &&
+        	Date.now() - cachedTemps[location].time < cacheDuration) {
+      		//Weather data is cached
+      		callback(cachedTemps[location].data);
+      		return;
+    	}
+
+    	// Make an AJAX call to the Open Weather Maps API
+    	$.ajax({
+      		url: 'http://api.openweathermap.org/data/2.5/weather',
+     		 data: {q: location, units: 'imperial', appid: '960f7f58abbc5c98030d1899739c1ba8'},
+      		dataType: 'jsonp',
+      		success: function(weatherData) {
+        	//Received the weather data. Cache and return the data.
+        	cachedTemps[location] = {data: weatherData, time: Date.now()};
+        	callback(weatherData);
+      		}
+    	});
+     }
+    
+    
+    
+    ext.getWeather = function(type, location, callback) {
+    fetchWeatherData(location, function(data) {
+      var val = getWeatherData(data, type);
+      callback(val);
+    	});
+    };
+/******************************************************/    
+    
+    
     var descriptor = {
         blocks: [
             [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
@@ -280,14 +347,16 @@
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
-	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1']
+	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
+	    ['r', '%m.WeatherDataType in %s', 'getWeather', 'temperature', 'Boston, MA'],	
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
   	    DigitalIOmode:['输入','输出'],
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
-  	    AnalogOutPortName:['PWM1','PWM2']
+  	    AnalogOutPortName:['PWM1','PWM2'],
+	    WeatherDataType:['temperature', 'weather', 'humidity', 'wind speed', 'cloudiness']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
