@@ -276,7 +276,7 @@
     var cacheDuration = 1800000 //ms, 30 minutes
     var cachedTemps = {};
 
-    function getWeatherDataFromJSOP(weatherData, type) {
+    function getWeatherDataFromJSOP(type , weatherData) {
     	var val = null;
     	console.log('温度:'+weatherData.main.temp);  
     	console.log('湿度:'+weatherData.main.humidity);
@@ -320,8 +320,8 @@
     
     function GetWeatherData(type, location){
 	   var WeatherData=fetchWeatherData(location);
-	   var ret=getWeatherDataFromJSOP(WeatherData);
-	    return ret;
+	   var ret=getWeatherDataFromJSOP(type,WeatherData);
+	   return ret;
     }
     
     ext.getWeather = function(type, location) {
