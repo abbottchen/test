@@ -337,6 +337,10 @@
 /******************************************************/    
     
     
+	
+	
+	
+/******************************************************/
     var descriptor = {
         blocks: [
             [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
@@ -345,7 +349,8 @@
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
-	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],	
+	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],
+	    ['R', '获取乐为物联APPID: %n 设备标识: %n  %m.SensorType标识: %n ', '0000','01','传感器','000']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
@@ -353,7 +358,8 @@
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','维度']
+	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','维度'],
+	    SensorType:['传感器', '控制器']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
