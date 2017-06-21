@@ -328,7 +328,7 @@
     	});
      }
     
-  ext.getWeather = function(type, location, callback) {
+  ext.getWeather = function(location, type, callback) {
     fetchWeatherData(location, function(data) {
       	var val = getWeatherDataFromJSOP(type,data);
       	callback(val);
@@ -410,7 +410,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
-	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],
+	    ['R', '%s %m.WeatherDataType 值 ', 'getWeather', 'Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'02' ,'传感器', '222']
         ],
         menus: {
