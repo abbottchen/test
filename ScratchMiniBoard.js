@@ -141,7 +141,7 @@
     function getSensor(which) {
         return inputs[which];
     }
-    ext.sensor = function(period,width,ch) { return getSensor(which); };	
+    ext.sensor = function(width) { return getSensor(which); };	
 	
     function getSensorFromFrame(Frame){
 	inputs['D1']=(Frame[2]>>0)&0x01;
@@ -276,32 +276,31 @@
     var cacheDuration = 1800000 //ms, 30 minutes
     var cachedTemps = {};
 
-    function getWeatherData(weatherData, type) {
-    var val = null;
-    console.log('温度:'+weatherData.main.temp);  
-    console.log('湿度:'+weatherData.main.humidity);
-    console.log('风速:'+weatherData.main.speed);     
-    switch (type) {
-      case '温度':
-        val = weatherData.main.temp;
+    function getWeatherDataFromJSOP(weatherData, type) {
+    	var val = null;
+    	console.log('温度:'+weatherData.main.temp);  
+    	console.log('湿度:'+weatherData.main.humidity);
+    	console.log('风速:'+weatherData.main.speed);     
+    	switch (type) {
+      	case '温度':
+       	 	val = weatherData.main.temp;
         break;
-      case '湿度':
-        val = weatherData.main.humidity;
+      	case '湿度':
+        	val = weatherData.main.humidity;
         break;
-      case '风速':
-        val = weatherData.wind.speed;
+      	case '风速':
+        	val = weatherData.wind.speed;
         break;
-    }
-    return(val);
+   	}
+    	return(val);
   }
     
-     function fetchWeatherData(location, callback) {
+     function fetchWeatherData(location) {
     	if (location in cachedTemps &&
         	Date.now() - cachedTemps[location].time < cacheDuration) {
       		//Weather data is cached
-      		callback(cachedTemps[location].data);
 		console.log('取缓冲区:'+cachedTemps[location].data); 
-      		return;
+      		return cachedTemps[location].data;
     	}
 
     	// Make an AJAX call to the Open Weather Maps API
@@ -313,18 +312,20 @@
 		console.log('ajax获取数据:'+weatherData); 	
         	//Received the weather data. Cache and return the data.
         	cachedTemps[location] = {data: weatherData, time: Date.now()};
-        	callback(weatherData);
+		return weatherData;
       		}
     	});
+	 return null;
      }
     
+    function GetWeatherData(type, location){
+	   var WeatherData=fetchWeatherData(location);
+	   var ret=getWeatherDataFromJSOP(WeatherData);
+	    return ret;
+    }
     
-    
-    ext.getWeather = function(type, location, callback) {
-    fetchWeatherData(location, function(data) {
-      var val = getWeatherData(data, type);
-      callback(val);
-    	});
+    ext.getWeather = function(type, location) {
+	return GetWeatherData(type,location);
     };
 /******************************************************/    
     
