@@ -396,8 +396,8 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData(appid, function(data) {
 	  console.log('设备数量:'+data.length);  
-      	  var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
-	  //var val=0;
+      	  //var val = GetLeiweiValue(data , 'ScratchminiBoard', '传感器', '湿度');
+	  var val=0;
       	callback(val);
     });
   };
