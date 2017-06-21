@@ -296,10 +296,10 @@
         	val = weatherData.main.pressure/10;		// 单位kPa
         break;
 	case '经度':
-        	val = weatherData.lon;
+        	val = weatherData.coord.lon;
 	break;
 	case '维度':
-        	val = weatherData.lat;
+        	val = weatherData.coord.lat;
 	break;			
    	}
 	//console.log('getWeatherDataFromJSOP'+val);  
@@ -350,7 +350,7 @@
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
 	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],
-	    ['R', '获取乐为物联APPID: %n 设备标识: %n  %m.SensorType标识: %n ', '0000','01','传感器','000']
+	    ['R', '获取乐为物联APPID: %n ,设备标识: %n , %m.SensorType 标识: %n ', '0000','01','传感器','000']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
