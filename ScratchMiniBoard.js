@@ -334,12 +334,56 @@
       	callback(val);
     });
   };
-/******************************************************/    
-    
-    
-	
-	
-	
+/******************************************************/ 
+/******************************************************/  
+function fetchLeiweiData(appid, callback) {
+    	// Make an AJAX call to the Open Weather Maps API
+    	$.ajax({ 
+      		url: 'http://www.lewei50.com/api/V1/user/getSensorsWithGateway',
+     		data: {userkey: appid},
+     		type: 'GET',
+     		dataType: 'jsonp',
+      		success: function(LeiweiData) {
+			console.log('ajax返回数据:'+LeiweiData); 
+			callback(LeiweiData);
+      		}
+    	});
+}    
+
+function GetLeiweiValue(json , device, sensortype, sensorname) {
+	var DeviceNum=json.length;
+	var Num=0;
+	onsole.log('设备数量:'+DeviceNum); 
+        for(var i=0;i<DeviceNum;i++){
+		if(sensortype=='传感器'）
+		{
+		   Num=json[i].sensors.length;
+		   for(var j=0;j<Num;j++){
+			if(json[i].sensors[j].name==sensorname){
+				return json[i].sensors[j].value;
+			}
+        	   }
+		}
+		else if(sensortype=='控制器'）
+		{
+		   Num=json[i].sensors.length;
+		   for(var j=0;j<Num;j++){
+			if(json[i].controllers[j].name==sensorname){
+				return json[i].sensors[j].value;
+			}
+        	   }
+		}
+        }
+	return null;
+}
+ 
+  ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
+    fetchLeiweiData(appid, function(data) {
+      	var val = GetLeiweiValue(data , device, sensortype, sensorname);
+      	callback(val);
+    });
+  };
+
 /******************************************************/
     var descriptor = {
         blocks: [
@@ -350,7 +394,7 @@
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
 	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],
-	    ['R', '获取乐为物联APPID %n 设备名称 %n  %m.SensorType 名称 %n 的值', 0000 ,01 ,'传感器', '000']
+	    ['R', '获取乐为物联APPID %n 设备名称 %n  %m.SensorType 名称 %n 的值','GetLewei', 0000 ,01 ,'传感器', '000']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
