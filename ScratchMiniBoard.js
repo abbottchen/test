@@ -363,21 +363,28 @@ function GetLeiweiDevice(json , device) {
 
 function GetLeiweiSensor(json , sensorname) {
 	for(var i=0;i<json.sensors.length;i++){
-		console.log('传感器器名称:'+json.sensors[i].name);
+		console.log('传感器名称:'+json.sensors[i].name);
 		if(json.sensors[i].name==sensorname){
 			return json.sensors[i];
 		}
 	}
 	return null;
  }
+/*
+function GetLeiweiControl(json , sensorname) {
+	for(var i=0;i<json.controllers.length;i++){
+		console.log('控制器名称:'+json.controllers[i].name);
+		if(json.controllers[i].name==sensorname){
+			return json.controllers[i];
+		}
+	}
+	return null;
+ }*/
 	
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
-    fetchLeiweiData(appid, function(data) {
-	  console.log('设备数量:'+data.length);  
+    fetchLeiweiData(appid, function(data) { 
 	  var jsondevice=GetLeiweiDevice(data,device);
-	  console.log('GetLeiweiDevice返回设备名称:'+jsondevice);
 	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorname)
-	  console.log('GetLeiweiSensor返回的传感器值:'+jsonSensor.value); 
 	  var val=jsonSensor.value;
       	callback(val);
     });
