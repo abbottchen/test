@@ -351,7 +351,7 @@ function fetchLeiweiData(appid, callback) {
 }    
 
 function GetLeiweiValue(json , device, sensortype, sensorname) {
-
+	/*
 	var i=0
 	console.log('设备数量:'+json.length); 
         for(i=0;i<json.length;i++){
@@ -375,7 +375,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
         	 }
 	}
 	return null;
-	/*
+	
 			
 			
 		
@@ -389,8 +389,8 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 			}
         	   }
 		}
-        }
-	return null;*/
+        }*/
+	return 0;
 }
  
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
