@@ -349,18 +349,21 @@ function fetchLeiweiData(appid, callback) {
       		}
     	});
 }    
-/*
+
 function GetLeiweiValue(json , device, sensortype, sensorname) {
 	var DeviceNum=json.length;
 	var Num=0;
-	onsole.log('设备数量:'+DeviceNum); 
+	console.log('设备数量:'+DeviceNum); 
         for(var i=0;i<DeviceNum;i++){
+		console.log('设备名称:'+json[i].name);
 		if(json[i].name!=device)
 			continue;
 		if(sensortype=='传感器'）
 		{
 		   Num=json[i].sensors.length;
+		   console.log('传感器数量:'+Num);
 		   for(var j=0;j<Num;j++){
+			console.log('传感器名称:'+json[i].sensors[j].name);
 			if(json[i].sensors[j].name==sensorname){
 				return json[i].sensors[j].value;
 			}
@@ -370,6 +373,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 		{
 		   Num=json[i].sensors.length;
 		   for(var j=0;j<Num;j++){
+			console.log('控制器名称:'+json[i].controllers[j].name);
 			if(json[i].controllers[j].name==sensorname){
 				return json[i].sensors[j].value;
 			}
@@ -378,7 +382,7 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 		return null;
         }
 	return null;
-}*/
+}
  
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData(appid, function(data) {
