@@ -293,18 +293,17 @@
         	val = weatherData.wind.speed;
         break;
    	}
-	console.log('getWeatherDataFromJSOP'+val);  
+	//console.log('getWeatherDataFromJSOP'+val);  
     	return val;
   }
     
-     function fetchWeatherData(location) {
+     function fetchWeatherData(location,callback) {
     	if (location in cachedTemps &&
         	Date.now() - cachedTemps[location].time < cacheDuration) {
       		//Weather data is cached
 		console.log('取缓冲区:'+cachedTemps[location].data); 
-      		return cachedTemps[location].data;
+      		callback(cachedTemps[location].data);
     	}
-
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({ 
       		url: 'http://api.openweathermap.org/data/2.5/weather',
@@ -314,20 +313,17 @@
 		console.log('ajax返回数据:'+weatherData); 	
         	//Received the weather data. Cache and return the data.
         	cachedTemps[location] = {data: weatherData, time: Date.now()};
+		callback(weatherData);	
       		}
     	});
-	return cachedTemps[location].data;
      }
     
-    function GetWeatherData(type, location){
-	   var WeatherData=fetchWeatherData(location);
-	   var ret=getWeatherDataFromJSOP(type,WeatherData);
-	   return ret;
-    }
-    
-    ext.getWeather = function(type, location) {
-	return GetWeatherData(type,location);
-    };
+  ext.getWeather = function(type, location, callback) {
+    fetchWeatherData(location, function(data) {
+      	var val = getWeatherDataFromJSOP(type,data);
+      	callback(val);
+    });
+  };
 /******************************************************/    
     
     
@@ -338,8 +334,8 @@
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
-	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
-	    ['r', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],	
+	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 100 ,'PWM1'],
+	    ['R', '%m.WeatherDataType 值 %s', 'getWeather', '温度', 'Beijing'],	
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
