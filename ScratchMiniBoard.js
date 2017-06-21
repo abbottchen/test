@@ -292,6 +292,9 @@
       	case '风速':
         	val = weatherData.wind.speed;
         break;
+	case '大气压':
+        	val = weatherData.main.pressure;
+        break;
    	}
 	//console.log('getWeatherDataFromJSOP'+val);  
     	return val;
@@ -303,6 +306,7 @@
       		//Weather data is cached
 		console.log('取缓冲区:'+cachedTemps[location].data); 
       		callback(cachedTemps[location].data);
+		return;
     	}
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({ 
@@ -343,7 +347,7 @@
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速']
+	    WeatherDataType:['温度', '湿度', '风速','大气压']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
