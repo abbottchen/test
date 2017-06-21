@@ -306,11 +306,12 @@
 
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({
+		console.log('ajax请求数据:'); 
       		url: 'http://api.openweathermap.org/data/2.5/weather',
      		 data: {q: location, units: 'metric', appid: '960f7f58abbc5c98030d1899739c1ba8'},
       		dataType: 'jsonp',
       		success: function(weatherData) {
-		console.log('ajax获取数据:'+weatherData); 	
+		console.log('ajax返回数据:'+weatherData); 	
         	//Received the weather data. Cache and return the data.
         	cachedTemps[location] = {data: weatherData, time: Date.now()};
       		}
@@ -338,7 +339,7 @@
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期, %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 50 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
-	    ['r', '%m.WeatherDataType in %s', 'getWeather', '温度', 'Boston, MA'],	
+	    ['R', '%m.WeatherDataType in %s', 'getWeather', '温度', 'Boston, MA'],	
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
