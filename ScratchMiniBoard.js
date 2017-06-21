@@ -278,23 +278,29 @@
 
     function getWeatherDataFromJSOP(type , weatherData) {
     	var val = null;
-    	console.log('温度:'+weatherData.main.temp);  
-    	console.log('湿度:'+weatherData.main.humidity);
-    	console.log('风速:'+weatherData.wind.speed);
-	console.log('大气压:'+weatherData.main.pressure);
+    	//console.log('温度:'+weatherData.main.temp);  
+    	//console.log('湿度:'+weatherData.main.humidity);
+    	//console.log('风速:'+weatherData.wind.speed);
+	//console.log('大气压:'+weatherData.main.pressure);
     	switch (type) {
       	case '温度':
-       	 	val = weatherData.main.temp;
+       	 	val = weatherData.main.temp;			//单位：摄氏度
         break;
       	case '湿度':
         	val = weatherData.main.humidity;
         break;
       	case '风速':
-        	val = weatherData.wind.speed;
+        	val = weatherData.wind.speed;			//单位m/
         break;
 	case '大气压':
-        	val = weatherData.main.pressure;
+        	val = weatherData.main.pressure/10;		// 单位kPa
         break;
+	case '经度':
+        	val = weatherData.lon;
+	break;
+	case '维度':
+        	val = weatherData.lat;
+	break;			
    	}
 	//console.log('getWeatherDataFromJSOP'+val);  
     	return val;
@@ -347,7 +353,7 @@
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速','大气压']
+	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','维度']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
