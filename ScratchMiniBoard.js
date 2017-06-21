@@ -349,7 +349,7 @@ function fetchLeiweiData(appid, callback) {
       		}
     	});
 }    
-
+/*
 function GetLeiweiValue(json , device, sensortype, sensorname) {
 	var DeviceNum=json.length;
 	var Num=0;
@@ -378,11 +378,12 @@ function GetLeiweiValue(json , device, sensortype, sensorname) {
 		return null;
         }
 	return null;
-}
+}*/
  
   ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
     fetchLeiweiData(appid, function(data) {
-      	var val = GetLeiweiValue(data , device, sensortype, sensorname);
+      	//var val = GetLeiweiValue(data , device, sensortype, sensorname);
+	    var val=0;
       	callback(val);
     });
   };
