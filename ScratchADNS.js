@@ -13,32 +13,32 @@
 	 if(FrameStep>280)
 		FrameStep=0; 
 	//等待接收帧头    
-    if(FrameStep==0){
-		  if(ch==0xaa){
-			  FrameStep=1;
-			  FrameBuf[0]=ch;
-		  }
-	  }
-   else if((FrameStep>=1)&&(FrameStep<485)){
+    	if(FrameStep==0){
+		if(ch==0xaa){
+			FrameStep=1;
+			FrameBuf[0]=ch;
+		}
+	}
+   	else if((FrameStep>=1)&&(FrameStep<485)){
 		FrameBuf[FrameStep]=ch;
 		FrameStep++;
 	}
-  else if(FrameStep==485) 
-  {
-      if(ch==0x16){
-			  clearTimeout(watchdog); 
-        watchdog = null;
-      }
-      else
-      {
-        console.log('结束符错误'+ch);
-        FrameStep=0;
-      }
-  }
-  else
-  {
-    FrameStep=0;
-  }
+  	else if(FrameStep==485) 
+  	{
+      		if(ch==0x16){
+			clearTimeout(watchdog); 
+        		watchdog = null;
+      		}		
+      		else
+      		{
+        		console.log('结束符错误'+ch);
+        		FrameStep=0;
+      		}
+  	}
+ 	else
+  	{
+   	 	FrameStep=0;
+  	}
 }
 
     // Extension API interactions
