@@ -1,12 +1,13 @@
 // This is an extension for development and testing of the Scratch Javascript Extension API.
 
 (function(ext) {
-    var UART_REV_FRAME_LEN=9;
+    var UART_REV_FRAME_LEN=484;
     var device = null;
 
     var	FrameStep=0;
-    var FrameBuf= new Uint8Array(100);
-    var DataLen=0;
+    var FrameBuf= new Uint8Array(800);
+    var DataBuf= new Uint8Array(800);
+    var	WhenDataOKReq=0;
 	
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
@@ -19,15 +20,19 @@
 			FrameBuf[0]=ch;
 		}
 	}
-   	else if((FrameStep>=1)&&(FrameStep<485)){
+   	else if((FrameStep>=1)&&(FrameStep<(UART_REV_FRAME_LEN+1))){
 		FrameBuf[FrameStep]=ch;
 		FrameStep++;
 	}
-  	else if(FrameStep==485) 
+  	else if(FrameStep==(UART_REV_FRAME_LEN+1)) 
   	{
       		if(ch==0x16){
 			clearTimeout(watchdog); 
         		watchdog = null;
+			for(var j=0;j<UART_REV_FRAME_LEN;j++){
+				DataBuf[j]=FrameBuf[j];
+			}
+			WhenDataOKReq=1;
       		}		
       		else
       		{
@@ -64,8 +69,7 @@
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
-		            //console.log(rawData[i]);
-		          GetFrame(rawData[i]);  
+		GetFrame(rawData[i]);  
             }
         });
 
@@ -94,11 +98,24 @@
         //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
         return {status: 2, msg: 'ScratchMiniBoard connected'};
     }
+    
+    ext.WhenPicDataOK = function() {
+	    
+        if (WhenDataOKReq >0) {
+		WhenDataOKReq=0;
+		return true;
+	}
+        else{
+		return false;
+	}
+    };
+
+    
 /******************************************************/
     var descriptor = {
         blocks: [
             ['r', 'X %n Y %n 灰度值', 'PicData', '0', '0'],
-            ['h', '当接收到图像数据', 'SetDigitPortLevel']
+            ['h', '当接收到图像数据', 'WhenPicDataOK']
         ],
         menus: {
         },
