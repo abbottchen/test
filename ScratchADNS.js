@@ -9,6 +9,8 @@
     var DataBuf= new Uint8Array(800);
     var	WhenDataOKReq=0;
 	
+	
+	
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
 	 if(FrameStep>280)
@@ -110,7 +112,9 @@
 	}
     };
 
-    
+    ext.PicData = function(x,y) {
+	return DataBuf[x*22+y];
+    }
 /******************************************************/
     var descriptor = {
         blocks: [
