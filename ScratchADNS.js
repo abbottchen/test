@@ -66,7 +66,7 @@
         device = potentialDevices.shift();
         if (!device) return;
 
-        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
+        device.open({ stopBits: 0, bitRate: 115200, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 	    var rawData = new Uint8Array(data);	
 	    console.log('Received size' + data.byteLength);	
@@ -120,7 +120,7 @@
 /******************************************************/
     var descriptor = {
         blocks: [
-            ['r', 'X %n Y %n 灰度值', 'PicData', '1', '0'],
+            ['r', 'X %n Y %n 灰度值', 'PicData', '2', '0'],
             ['h', '当接收到图像数据', 'WhenPicDataOK']
         ],
         menus: {
