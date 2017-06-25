@@ -13,7 +13,7 @@
 	
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
-	 if(FrameStep>280)
+	 if(FrameStep>800)
 		FrameStep=0; 
 	//等待接收帧头    
     	if(FrameStep==0){
@@ -118,7 +118,7 @@
 /******************************************************/
     var descriptor = {
         blocks: [
-            ['r', 'X %n Y %n 灰度值', 'PicData', '0', '0'],
+            ['r', 'X %n Y %n 灰度值', 'PicData', '1', '0'],
             ['h', '当接收到图像数据', 'WhenPicDataOK']
         ],
         menus: {
