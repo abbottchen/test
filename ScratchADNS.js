@@ -13,6 +13,8 @@
 	
     function GetFrame(ch) {
 	 //AA 95 4F FE FE FE BF 47 16
+	 console.log('FrameStep' + FrameStep);
+	 console.log('ch' + ch);
 	 if(FrameStep>800)
 		FrameStep=0; 
 	//等待接收帧头    
@@ -67,7 +69,7 @@
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 	    var rawData = new Uint8Array(data);	
-	    //console.log('Received size' + data.byteLength);	
+	    console.log('Received size' + data.byteLength);	
             //放置接收的数据到环形缓冲区
             for(var i=0;i<data.byteLength;i++)
             {
