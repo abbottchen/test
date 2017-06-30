@@ -511,7 +511,7 @@ var Request = {
     }
 };	
 
-ext.SetLewei = function(appid , device, sensortype, sensorname) {
+ext.SetLewei = function(appid , device, sensortype, sensorname, data) {
    Request.ajax({
 	url: "http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/da34db80af9c46669159fe8982bbdbe0/01",
     	type: "post",
