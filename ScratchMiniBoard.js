@@ -517,7 +517,7 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
     	type: "post",
     	data: '[{"Name":"Humidity","Value":"'+json+'"}]',
     	async: true,
-	console.log('[{"Name":"Humidity","Value":"'+json+'"}]'); 	
+	//console.log('[{"Name":"Humidity","Value":"'+json+'"}]'); 	
     	success: function(res){
     	},
     	error: function(ex){
