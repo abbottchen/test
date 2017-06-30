@@ -511,12 +511,13 @@ var Request = {
     }
 };	
 
-ext.SetLewei = function(appid , device, sensortype, sensorname, data) {
+ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
    Request.ajax({
 	url: "http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/da34db80af9c46669159fe8982bbdbe0/01",
     	type: "post",
-    	data: '[{"Name":"Humidity","Value:"'+data+'}]',
+    	data: '[{"Name":"Humidity","Value":"'+json+'"}]',
     	async: true,
+	console.log('[{"Name":"Humidity","Value":"'+json+'"}]'); 	
     	success: function(res){
     	},
     	error: function(ex){
