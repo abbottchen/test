@@ -298,7 +298,7 @@
 	case '经度':
         	val = weatherData.coord.lon;
 	break;
-	case '维度':
+	case '纬度':
         	val = weatherData.coord.lat;
 	break;			
    	}
@@ -306,7 +306,7 @@
     	return val;
   }
     
-     function fetchWeatherData(location,callback) {
+     function fetchWeatherData(APPID,location,callback) {
     	if (location in cachedTemps &&
         	Date.now() - cachedTemps[location].time < cacheDuration) {
       		//Weather data is cached
@@ -317,7 +317,7 @@
     	// Make an AJAX call to the Open Weather Maps API
     	$.ajax({ 
       		url: 'http://api.openweathermap.org/data/2.5/weather',
-     		 data: {q: location, units: 'metric', appid: '960f7f58abbc5c98030d1899739c1ba8'},
+     		 data: {q: location, units: 'metric', appid:APPID},
       		dataType: 'jsonp',
       		success: function(weatherData) {
 		console.log('ajax返回数据:'+weatherData); 	
@@ -328,8 +328,8 @@
     	});
      }
     
-  ext.getWeather = function(location, type, callback) {
-    fetchWeatherData(location, function(data) {
+  ext.getWeather = function(APPID,location, type, callback) {
+    fetchWeatherData(APPID,location, function(data) {
       	var val = getWeatherDataFromJSOP(type,data);
       	callback(val);
     });
@@ -536,9 +536,9 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 180 ,'PWM1'],
-	    ['R', '%s %m.WeatherDataType 值 ', 'getWeather', 'Beijing', '温度'],
+	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度'],
-	    [' ', '设置乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值为 %n ','SetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度','5']
+	    [' ', '设置乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值为 %n ','SetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度','10']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
@@ -546,7 +546,7 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','维度'],
+	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','纬度'],
 	    SensorType:['传感器', '控制器']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
