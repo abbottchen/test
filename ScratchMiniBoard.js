@@ -515,7 +515,7 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, data) {
    Request.ajax({
 	url: "http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/da34db80af9c46669159fe8982bbdbe0/01",
     	type: "post",
-    	data: '[{"Name":"Humidity","Value":"90"}]',
+    	data: '[{"Name":"Humidity","Value:"'+data+'}]',
     	async: true,
     	success: function(res){
     	},
@@ -537,7 +537,7 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, data) {
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 180 ,'PWM1'],
 	    ['R', '%s %m.WeatherDataType 值 ', 'getWeather', 'Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度'],
-	    [' ', '设置乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值为 %n ','SetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度','80']
+	    [' ', '设置乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值为 %n ','SetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度','60']
         ],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
