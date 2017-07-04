@@ -480,7 +480,7 @@ function GetLeiweiDevice(json , idName) {
 function GetLeiweiSensor(json , sensorid) {
 	for(var i=0;i<json.sensors.length;i++){
 		console.log('传感器名称:'+json.sensors[i].id);
-		if(json.sensors[i].id==sensorid){
+		if(json.sensors[i].idName==sensorid){
 			return json.sensors[i];
 		}
 	}
@@ -528,9 +528,9 @@ ext.SetLewei = function(appid , idName, sensorid, data) {
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , '湿度'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10']，
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10'],
             ['R', '获取Yeelink apikey %s 设备为 %s  传感器为 %s 的值','GetYeelink', '57f36d198515f6e4c090187c4c9ab54b' ,'00001' ,'00001'],
-	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值','SetYeelink', '57f36d198515f6e4c090187c4c9ab54b' ,'00001' ,'00001','0']
+	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','00001' ,'00001','0']
 	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
@@ -538,8 +538,8 @@ ext.SetLewei = function(appid , idName, sensorid, data) {
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','纬度'],
-	    SensorType:['传感器', '控制器']
+	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','纬度']
+	    //SensorType:['传感器', '控制器']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
