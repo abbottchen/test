@@ -334,71 +334,10 @@
       	callback(val);
     });
   };
+	
 /******************************************************/ 
-/******************************************************/  
-function fetchLeiweiData(appid, callback) {
-    	// Make an AJAX call to the Open Weather Maps API
-    	$.ajax({ 
-      		url: 'http://www.lewei50.com/api/V1/user/getSensorsWithGateway',
-     		data: {userkey: appid},
-     		type: 'GET',
-     		dataType: 'jsonp',
-      		success: function(LeiweiData) {
-			console.log('ajax返回数据:'+LeiweiData); 
-			callback(LeiweiData);
-      		}
-    	});
-}    
-
-	
-function GetLeiweiDevice(json , device) {
-	for(var i=0;i<json.length;i++){
-		console.log('设备名称:'+json[i].name);
-		if(json[i].name==device){
-			return json[i];
-		}
-	}
-	return null;
- }
-
-function GetLeiweiSensor(json , sensorname) {
-	for(var i=0;i<json.sensors.length;i++){
-		console.log('传感器名称:'+json.sensors[i].name);
-		if(json.sensors[i].name==sensorname){
-			return json.sensors[i];
-		}
-	}
-	return null;
- }
-/*
-function GetLeiweiControl(json , sensorname) {
-	for(var i=0;i<json.controllers.length;i++){
-		console.log('控制器名称:'+json.controllers[i].name);
-		if(json.controllers[i].name==sensorname){
-			return json.controllers[i];
-		}
-	}
-	return null;
- }*/
-	
-  ext.GetLewei = function(appid , device, sensortype, sensorname,callback) {
-    fetchLeiweiData(appid, function(data) { 
-	  var jsondevice=GetLeiweiDevice(data,device);
-	  if(null==jsondevice){
-		callback(null);
-		return;
-	  }
-	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorname)
-	  if(null==jsonSensor){
-		callback(null);
-		return;
-	  }
-	  var val=jsonSensor.value;
-      	callback(val);
-    });
-  };
-	
-       /******************************************************/	
+/*跨域访问的通用代码*/
+/******************************************************/  	
 var Request = {
     // 生成时间戳
     now : function(){
@@ -510,23 +449,74 @@ var Request = {
         document.head.appendChild(script);
     }
 };	
+/******************************************************/ 
+/*获取和设置乐为物联上的传感器数据*/
+/******************************************************/   	
+function fetchLeiweiData(appid, callback) {
+    	// Make an AJAX call to the Open Weather Maps API
+    	$.ajax({ 
+      		url: 'http://www.lewei50.com/api/V1/user/getSensorsWithGateway',
+     		data: {userkey: appid},
+     		type: 'GET',
+     		dataType: 'jsonp',
+      		success: function(LeiweiData) {
+			console.log('ajax返回数据:'+LeiweiData); 
+			callback(LeiweiData);
+      		}
+    	});
+}    
 
-ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
+	
+function GetLeiweiDevice(json , idName) {
+	for(var i=0;i<json.length;i++){
+		console.log('设备名称:'+json[i].idName);
+		if(json[i].idName==idName){
+			return json[i];
+		}
+	}
+	return null;
+ }
+
+function GetLeiweiSensor(json , sensorid) {
+	for(var i=0;i<json.sensors.length;i++){
+		console.log('传感器名称:'+json.sensors[i].id);
+		if(json.sensors[i].id==sensorid){
+			return json.sensors[i];
+		}
+	}
+	return null;
+}
+	
+ext.GetLewei = function(appid , idName, sensorid,callback) {
+    fetchLeiweiData(appid, function(data) { 
+	  var jsondevice=GetLeiweiDevice(data,idName);
+	  if(null==jsondevice){
+		callback(null);
+		return;
+	  }
+	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorid)
+	  if(null==jsonSensor){
+		callback(null);
+		return;
+	  }
+	  var val=jsonSensor.value;
+      	callback(val);
+    });
+  };
+	
+ext.SetLewei = function(appid , idName, sensorid, data) {
    Request.ajax({
-	url: "http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/da34db80af9c46669159fe8982bbdbe0/01",
+	url: 'http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/'+appid+'/'+idName,
     	type: "post",
-    	data: '[{"Name":"Humidity","Value":"'+json+'"}]',
-    	async: true,
-	//console.log('[{"Name":"Humidity","Value":"'+json+'"}]'); 	
+    	data: '[{"Name":"'+idName+',"Value":"'+data+'"}]',
+    	async: true,	
     	success: function(res){
     	},
     	error: function(ex){
     	alert("error"+ex)
     	}
 });	
-};
-
-	
+};	
 /******************************************************/
     var descriptor = {
         blocks: [
@@ -537,9 +527,11 @@ ext.SetLewei = function(appid , device, sensortype, sensorname, json) {
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
-	    ['R', '获取乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值','GetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度'],
-	    [' ', '设置乐为物联APPID %s 设备名称 %s  %m.SensorType 名称 %s 的值为 %n ','SetLewei', 'da34db80af9c46669159fe8982bbdbe0' ,'ban1' ,'传感器', '湿度','10']
-        ],
+	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , '湿度'],
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10']，
+            ['R', '获取Yeelink apikey %s 设备为 %s  传感器为 %s 的值','GetYeelink', '57f36d198515f6e4c090187c4c9ab54b' ,'00001' ,'00001'],
+	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值','SetYeelink', '57f36d198515f6e4c090187c4c9ab54b' ,'00001' ,'00001','0']
+	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
   	    DigitalIOmode:['输入','输出'],
