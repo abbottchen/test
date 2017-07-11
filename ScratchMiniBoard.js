@@ -529,8 +529,8 @@ ext.SetLewei = function(appid , idName, sensorid, data) {
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , '湿度'],
 	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10'],
-            ['R', '获取Yeelink apikey %s 设备为 %s  传感器为 %s 的值','GetYeelink', '57f36d198515f6e4c090187c4c9ab54b' ,'00001' ,'00001'],
-	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','00001' ,'00001','0']
+            ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
+	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
