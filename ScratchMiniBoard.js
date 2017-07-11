@@ -338,117 +338,41 @@
 /******************************************************/ 
 /*跨域访问的通用代码*/
 /******************************************************/  	
-var Request = {
-    // 生成时间戳
-    now : function(){
-        return (new Date()).getTime();
-    },
-    // 数据转化成url
-    parseData : function(data){
-        var str = "";
-        if(typeof data === "string"){
-            str = data;
-        }else{
-            // json格式
-            for(var key in data){
-                str += "&" + key + "=" + encodeURIComponent(data[key]);
-            }
-        }
-        // 加时间戳，防止缓存
-        str += "&_time=" + this.now();
-        str = str.substr(1);
-        return str;
-    },
-    // 创建XHR实例。
-    createXhr: function(){
-        var xhrhttp = null;
-        if(window.XMLHttpRequest){
-            xhrhttp = new XMLHttpRequest();
-        }else{
-            xhrhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        return xhrhttp;
-    },
-    // 异步请求
-    ajax: function(opt){
-        var opts = opt || {},
-            url = opts.url || "",
-            type = (opts.type || "get").toLowerCase(),
-            async = opts.async || true,
-            //params = this.parseData(opts.data),
-            params=opts.data,
-            sendstr = null;
-
-        if(type == "get"){
-            url = url + "?=" + params;
-        }else{
-            sendstr = params;
-        }
-
-        var xhr = this.createXhr();
-        xhr.open(type, url, async);
-        // 监听状态改变并触发事件。
-        xhr.onreadystatechange = function(){
-            // 当请求状态readyState 等于 4 且服务器http状态码为 200 时，表示响应已就绪：
-            if(xhr.readyState == 4){
-                if(xhr.status == 200){
-                    opts.success && opts.success(xhr.responseText);
-                }else{
-                    opts.error && opts.error(xhr.status);
-                }
-            }
-        };
-        // POST需要设置请求头部
-        if(type == "post"){
-            //xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-            xhr.setRequestHeader("Content-Type","text");
-            //xhr.setRequestHeader("&userkey=da34db80af9c46669159fe8982bbdbe0&",""); 
-        }
-        // get请求，sendstr = null;
-        xhr.send(sendstr);
-    },
-    // 删除节点
-    removeElement: function(ele){
-        var parent = ele.parentNode;
-        if(parent && parent.nodeType == 1){
-            parent.removeChild(ele);
-        }
-    },
-    // 跨域jsonp请求
-    jsonp: function (url, data, funs){
-        var backname;
-
-        url += (url.indexOf("?") == -1 ? "?" : "&") + this.parseData(data);
-
-        var match = url.match(/callback=(\w+)/);
-
-        if(match && match[1]){
-            backname = match[1];
-        }else{
-            //如果未定义函数名,则随机成一个函数名
-            backname = "jsonp_" + this.now();
-
-            // 传入callback
-            url += "&callback=" + backname;
-        }
-
-        var script = document.createElement("script");
-            script.type = "text/javascript";
-            script.src = url;
-
-        // 远程回调函数，设置成全局可调用。
-        window[backname] = function(data){
-            // 执行后销毁，
-            window[backname] = undefined;
-            // 删除生成的script标签，防止污染DOM
-            Request.removeElement(script);
-            // 执行回调。
-            funs(data);
-        };
-        // 在head里面插入script元素
-        document.head.appendChild(script);
+function createCORS(method, url){
+    var xhr = new XMLHttpRequest();
+    if('withCredentials' in xhr){
+        xhr.open(method, url, true);
+    }else if(typeof XDomainRequest != 'undefined'){
+        var xhr = new XDomainRequest();
+        xhr.open(method, url);
+    }else{
+        xhr = null;
     }
-};	
+    return xhr;
+}
+
+function StrToJSON(str) {
+ json = eval('('+str+')');
+ return json;
+}
+
+function GetCORSJson(url,callback){
+	var request = createCORS('get', url);	
+	if(request){
+		request.onreadystatechange = function () {
+			if(request.readyState == 4){
+				if(request.status >= 200 && request.status < 304 || request.status == 304){
+					//console.log(request.responseText);
+					callback(request.responseText);
+				}
+	 		}
+		}
+	    request.send();
+	}	
+}
+
+var VPS_url='http://23.106.137.114:5000/';
+var IotSetTime = {};	
 /******************************************************/ 
 /*获取和设置乐为物联上的传感器数据*/
 /******************************************************/   	
@@ -460,62 +384,51 @@ function fetchLeiweiData(appid, callback) {
      		type: 'GET',
      		dataType: 'jsonp',
       		success: function(LeiweiData) {
-			console.log('ajax返回数据:'+LeiweiData); 
+			//console.log('ajax返回数据:'+LeiweiData); 
 			callback(LeiweiData);
       		}
     	});
-}    
-
-	
-function GetLeiweiDevice(json , idName) {
-	for(var i=0;i<json.length;i++){
-		console.log('设备名称:'+json[i].idName);
-		if(json[i].idName==idName){
-			return json[i];
-		}
-	}
-	return null;
- }
-
-function GetLeiweiSensor(json , sensorid) {
-	for(var i=0;i<json.sensors.length;i++){
-		console.log('传感器名称:'+json.sensors[i].id);
-		if(json.sensors[i].idName==sensorid){
-			return json.sensors[i];
-		}
-	}
-	return null;
-}
+} 
 	
 ext.GetLewei = function(appid , idName, sensorid,callback) {
-    fetchLeiweiData(appid, function(data) { 
-	  var jsondevice=GetLeiweiDevice(data,idName);
-	  if(null==jsondevice){
-		callback(null);
-		return;
-	  }
-	  var jsonSensor= GetLeiweiSensor(jsondevice,sensorid)
-	  if(null==jsonSensor){
-		callback(null);
-		return;
-	  }
-	  var val=jsonSensor.value;
-      	callback(val);
+    fetchLeiweiData(appid, function(json) { 
+    	for(var i=0;i<json.length;i++){
+	  if(json[i].idName==idName){
+             var device=json[i];
+              //console.log('找到设备:'+device.idName);
+             for(var j=0;j<device.sensors.length;j++){
+                //console.log('传感器:'+device.sensors[j].idName);
+                if(device.sensors[j].idName==sensorid){
+                   console.log('传感器值:'+device.sensors[j].value);
+                   //return device.sensors[j].value;
+                   callback(device.sensors[j].value);
+                }
+             }
+           }
+        }
     });
-  };
+};
 	
-ext.SetLewei = function(appid , idName, sensorid, data) {
-   Request.ajax({
-	url: 'http://06fe8ce61ee9424f9714880b8ee163ee-cn-hangzhou.alicloudapi.com/SetSensorData/'+appid+'/'+idName,
-    	type: "post",
-    	data: '[{"Name":"'+idName+',"Value":"'+data+'"}]',
-    	async: true,	
-    	success: function(res){
-    	},
-    	error: function(ex){
-    	alert("error"+ex)
+	
+ext.SetLewei = function(appid , idName, sensorid, value) {
+	//15s内不得联系发送请求
+	if ('Lewei' in IotSetTime 
+        	&&Date.now() - IotSetTime['Lewei'].time < 15000) {
+        		console.log((Date.now() - IotSetTime['Lewei'].time)/1000);	
+			return;
     	}
-});	
+        
+	IotSetTime['Lewei'] = {time: Date.now()};
+	console.log(IotSetTime['Lewei'].time );
+	var	Leweiurl='http://www.lewei50.com/api/V1/gateway/UpdateSensors/'+idName
+	var url=VPS_url+'post'
+	+'?&u='+Leweiurl
+	+'&h=userkey:'+appid
+	+'&b=[{"Name":"'+sensorid+'","Value":"'+value+'"}]'
+	console.log(url);
+	GetCORSJson(url,function(json) {
+     	 	console.log(json);
+   	});
 };	
 /******************************************************/
     var descriptor = {
@@ -528,7 +441,7 @@ ext.SetLewei = function(appid , idName, sensorid, data) {
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , '湿度'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10'],
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','5'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
@@ -539,7 +452,6 @@ ext.SetLewei = function(appid , idName, sensorid, data) {
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
 	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','纬度']
-	    //SensorType:['传感器', '控制器']
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
