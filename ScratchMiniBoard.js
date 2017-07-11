@@ -429,6 +429,41 @@ ext.SetLewei = function(appid , idName, sensorid, value) {
 	GetCORSJson(url,function(json) {
      	 	console.log(json);
    	});
+};
+/******************************************************/ 
+/*获取和设置Yeelink上的传感器数据*/
+/******************************************************/  	
+ext.GetYeelink = function(device,sensor,callback) {
+	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
+	var url=VPS_url+'get'
+	+'?&u='+yeelinkurl
+	+'&h='
+	+'&b='
+	console.log(url);
+	GetCORSJson(url,function(json) {
+      		//console.log(json);
+      		console.log(StrToJSON(json).value);
+      		callback(StrToJSON(json).value);
+   	});  
+};	
+
+ext.SetYeelink = function(appid,device,sensor,value){
+	//15s内不得联系发送请求
+	if ('Yeelink' in IotSetTime 
+        &&Date.now() - IotSetTime['Yeelink'].time < 15000) {
+		return;
+    	}
+	
+	IotSetTime['Yeelink'] = {time: Date.now()};
+	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoint'
+	var url=VPS_url+'post'
+	+'?&u='+yeelinkurl
+	+'&h=U-ApiKey:'+appid
+	+'&b={"value": '+value+'}'
+	console.log(url);
+	GetCORSJson(url,function(json) {
+     		console.log(json);
+   	});	
 };	
 /******************************************************/
     var descriptor = {
