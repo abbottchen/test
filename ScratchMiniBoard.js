@@ -450,14 +450,14 @@ ext.GetYeelink = function(device,sensor) {
 	}
 	for(var i=0;i<sn;i++){
 		if(YeelinkData[i].device==device&&YeelinkData[i].sensor==sensor){
-			console.log('返回:'+YeelinkData[i].value);
+			//console.log('返回:'+YeelinkData[i].value);
 			return YeelinkData[i].value;
 		}
 	}	
 	YeelinkData[sn]={device: 0, sensor:0, value:null,time: Date.now()};
 	YeelinkData[sn].device=device;
 	YeelinkData[sn].sensor=sensor;
-	return null;
+	return '';
 }	
 
 ext.SetYeelink = function(appid,device,sensor,value){
