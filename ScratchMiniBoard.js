@@ -255,7 +255,9 @@
         }, 500);
     };
 	
-    ext.resetAll = function(){};	
+    ext.resetAll = function(){
+	setInterval("GetYeelinkpoll()", 10000);
+    };	
 
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
@@ -423,19 +425,69 @@ ext.SetLewei = function(appid , idName, sensorid, value) {
 };
 /******************************************************/ 
 /*获取和设置Yeelink上的传感器数据*/
-/******************************************************/  	
-ext.GetYeelink = function(device,sensor,callback) {
-	var yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
+/******************************************************/  
+//获取Yeelink的数据
+function GetYeelinkData(sn,device,sensor,callback){
+	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
 	var url=VPS_url+'get'
 	+'?&u='+yeelinkurl
 	+'&h='
-	+'&b='
+	+'&b=';
 	console.log(url);
-	AJAX_JSON(url,5000,function(data){
-		console.log(data.value)
-		callback(data.value);
-	});
-};	
+	$.ajax({ 
+    	url: url,
+      	timeout:8000,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) { 
+			callback(sn,data);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  	});	
+}
+
+var YeelinkData =new Array();
+//获取Yeelink的数据
+function GetYeelinkpoll(){
+	console.log(Date.now()+' YeelinkData.length:'+YeelinkData.length);
+	for(var i=0;i<YeelinkData.length;i++){
+		GetYeelinkData(i,YeelinkData[i].device,YeelinkData[i].sensor,function(sn,data){
+			YeelinkData[sn].value=data.value;
+			YeelinkData[sn].time=Date.now();
+			console.log('YeelinkData['+sn+'].value:'+YeelinkData[sn].value);
+		});
+	}
+}
+
+function GetYeelink(device,sensor){
+	var sn=YeelinkData.length;
+	console.log('YeelinkData.length:'+sn);
+	for(var i=0;i<sn;i++){
+		if(YeelinkData[i].device==device&&YeelinkData[i].sensor==sensor){
+			return YeelinkData[i].value;
+		}
+	}	
+	YeelinkData[sn]={device: 0, sensor:0, value:null,time: Date.now()};
+	YeelinkData[sn].device=device;
+	YeelinkData[sn].sensor=sensor;
+	return null;
+}	
+
+ext.GetYeelink = function(device,sensor) {
+	var sn=YeelinkData.length;
+	console.log('YeelinkData.length:'+sn);
+	for(var i=0;i<sn;i++){
+		if(YeelinkData[i].device==device&&YeelinkData[i].sensor==sensor){
+			return YeelinkData[i].value;
+		}
+	}	
+	YeelinkData[sn]={device: 0, sensor:0, value:null,time: Date.now()};
+	YeelinkData[sn].device=device;
+	YeelinkData[sn].sensor=sensor;
+	return null;
+}	
 
 ext.SetYeelink = function(appid,device,sensor,value){
 	//15s内不得连续发送请求
@@ -463,7 +515,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','0'],
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','10'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
