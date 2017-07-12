@@ -446,6 +446,9 @@ function GetYeelinkpoll(){
 ext.GetYeelink = function(device,sensor) {
 	var sn=YeelinkData.length;
 	console.log('YeelinkData.length:'+sn);
+	if(sn==0){//启动循环服务
+	  setInterval("GetYeelinkpoll()", 10000);
+	}
 	for(var i=0;i<sn;i++){
 		if(YeelinkData[i].device==device&&YeelinkData[i].sensor==sensor){
 			return YeelinkData[i].value;
@@ -474,9 +477,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 };
 	
 /******************************************************/	
-  ext.resetAll = function(){
-	setInterval("GetYeelinkpoll()", 10000);
-    };	
+  ext.resetAll = function(){};	
 
     ext._deviceRemoved = function(dev) {
         if(device != dev) return;
@@ -491,6 +492,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
     ext._getStatus = function() {
         //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
         //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+	    
         return {status: 2, msg: 'ScratchMiniBoard connected'};
     }	
 	
@@ -505,7 +507,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','15'],
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','20'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
