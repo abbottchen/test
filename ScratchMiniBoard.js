@@ -338,52 +338,35 @@
 /******************************************************/ 
 /*跨域访问的通用代码*/
 /******************************************************/  	
-function StrToJSON(str) {
- json = eval('('+str+')');
- return json;
-}
-
-function GetCORSJson(url,callback){
-	var request = new XMLHttpRequest();
-    if('withCredentials' in request){
-        request.open('get', url, true);
-    }else if(typeof XDomainRequest != 'undefined'){
-        var request = new XDomainRequest();
-        request.open('get', url);
-    }else{
-        return;
-    }
-    //超时控制
-	var time = false;//是否超时
-    var timer = setTimeout(function(){
-        time = true;
-	console.log('超时时间到');
-        request.abort();//请求中止
-        callback(null);	    
-	return;//忽略中止请求    
-    },6000);
-
-    if(request){
-        request.onreadystatechange = function () {
-	    if(request.readyState == 4){
-                clearTimeout(timer);//取消等待的超时
-		if(request.status >= 200 && request.status < 304 || request.status == 304){
-	            callback(request.responseText);
-		}
-	    }
-            else if(time){
-                console.log('超时时间到:time');
-		callback(null);	
-		return;
-	    }
-	}
-    }
-    request.send(null);
-}	
-	
-
 var VPS_url='http://23.106.137.114:5000/';
-var IotSetTime = {};	
+var IotSetTime = {};
+function AJAX_JSON(url,timeout,callback)
+{
+	$.ajax({ 
+    	url: url,
+      	timeout:timeout,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) {
+			console.log('ajax返回数据:'+data); 
+			callback(data);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+   });	
+}
+	
+function CheckIotTimeInterval(type,ms){
+	if (type in IotSetTime &&Date.now() - IotSetTime[type].time < ms) {
+		console.log('时间未到:'+(Date.now() - IotSetTime['Lewei'].time)/1000);
+		return false;
+    	}
+	else{
+		IotSetTime[type] = {time: Date.now()};
+		return true;
+	}
+}	
 /******************************************************/ 
 /*获取和设置乐为物联上的传感器数据*/
 /******************************************************/   	
@@ -422,64 +405,52 @@ ext.GetLewei = function(appid , idName, sensorid,callback) {
 	
 	
 ext.SetLewei = function(appid , idName, sensorid, value) {
-	//15s内不得联系发送请求
-	if ('Lewei' in IotSetTime 
-        	&&Date.now() - IotSetTime['Lewei'].time < 15000) {
-        		console.log((Date.now() - IotSetTime['Lewei'].time)/1000);	
-			return;
-    	}
-        
-	IotSetTime['Lewei'] = {time: Date.now()};
-	console.log(IotSetTime['Lewei'].time );
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Lewei',15000)==false)
+		return
+		
 	var	Leweiurl='http://www.lewei50.com/api/V1/gateway/UpdateSensors/'+idName
 	var url=VPS_url+'post'
 	+'?&u='+Leweiurl
 	+'&h=userkey:'+appid
 	+'&b=[{"Name":"'+sensorid+'","Value":"'+value+'"}]'
 	console.log(url);
-	GetCORSJson(url,function(json) {
-     	 	console.log(json);
-   	});
+	
+	AJAX_JSON(url,5000,function(data){
+		console.log("设置完成"+data);
+		console.log(data.Successful);
+	});
 };
 /******************************************************/ 
 /*获取和设置Yeelink上的传感器数据*/
 /******************************************************/  	
 ext.GetYeelink = function(device,sensor,callback) {
-	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
+	var yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
 	var url=VPS_url+'get'
 	+'?&u='+yeelinkurl
 	+'&h='
 	+'&b='
 	console.log(url);
-	GetCORSJson(url,function(json) {
-      		//console.log(json);
-		if(json==null){
-			callback(null);
-		}
-		else{
-      			console.log(StrToJSON(json).value);
-      			callback(StrToJSON(json).value);
-		}
-   	});  
+	AJAX_JSON(yurl,5000,function(data){
+		console.log(data.value)
+		callback(data.value);
+	});
 };	
 
 ext.SetYeelink = function(appid,device,sensor,value){
-	//15s内不得联系发送请求
-	if ('Yeelink' in IotSetTime 
-        &&Date.now() - IotSetTime['Yeelink'].time < 15000) {
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Yeelink',15000)==false)
 		return;
-    	}
-	
-	IotSetTime['Yeelink'] = {time: Date.now()};
-	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoint'
-	var url=VPS_url+'post'
+		
+	var yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoint'
+	var yurl=VPS_url+'post'
 	+'?&u='+yeelinkurl
 	+'&h=U-ApiKey:'+appid
 	+'&b={"value": '+value+'}'
-	console.log(url);
-	GetCORSJson(url,function(json) {
-     		console.log(json);
-   	});	
+	console.log(yurl);
+	AJAX_JSON(yurl,5000,function(data){
+		console.log("设置完成")
+	});
 };	
 /******************************************************/
     var descriptor = {
