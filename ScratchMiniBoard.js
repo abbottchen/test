@@ -357,17 +357,25 @@ function GetCORSJson(url,callback){
 	var time = false;//是否超时
     var timer = setTimeout(function(){
         time = true;
-        request.abort();//请求中止
+        request.abort();//请求中止 
+	callback(null);
+	return;//忽略中止请求    
     },3000);
 
 	if(request){
 		request.onreadystatechange = function () {
-			if(request.readyState !==4) return;//忽略未完成的请求
-			if(time) return;//忽略中止请求
+			if(request.readyState !==4) {
+				callback(null);
+				return;//忽略未完成的请求
+			}
+			if(time) {
+				callback(null);
+				return;//忽略中止请求
+			}
 			clearTimeout(timer);//取消等待的超时
 			if(request.status == 200)
 				callback(request.responseText);
-			}
+		}
 	}
 	request.send(null);	
 }	
