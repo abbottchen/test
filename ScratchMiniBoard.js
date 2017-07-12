@@ -362,21 +362,21 @@ function GetCORSJson(url,callback){
 	return;//忽略中止请求    
     },3000);
 
-if(request){
-	request.onreadystatechange = function () {
-		if(request.readyState == 4){
-			clearTimeout(timer);//取消等待的超时
-			if(request.status >= 200 && request.status < 304 || request.status == 304){
-				callback(request.responseText);
-			}
-	 	}
-		else if(time){
-			console.log('超时时间到:time');
-			return;
+    if(request){
+        request.onreadystatechange = function () {
+	    if(request.readyState == 4){
+                clearTimeout(timer);//取消等待的超时
+		if(request.status >= 200 && request.status < 304 || request.status == 304){
+	            callback(request.responseText);
 		}
+	    }
+            else if(time){
+                console.log('超时时间到:time');
+		return;
+	    }
 	}
-   }
-   request.send(null);
+    }
+    request.send(null);
 }	
 	
 
