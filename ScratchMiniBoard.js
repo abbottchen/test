@@ -357,6 +357,7 @@ function GetCORSJson(url,callback){
 	var time = false;//是否超时
     var timer = setTimeout(function(){
         time = true;
+	console.log('超时时间到');
         request.abort();//请求中止 
 	callback(null);
 	return;//忽略中止请求    
@@ -365,10 +366,12 @@ function GetCORSJson(url,callback){
 	if(request){
 		request.onreadystatechange = function () {
 			if(request.readyState !==4) {
+				console.log('request.readyState: '+request.readyState );
 				callback(null);
 				return;//忽略未完成的请求
 			}
 			if(time) {
+				console.log('request 中超时: '+ time);
 				callback(null);
 				return;//忽略中止请求
 			}
@@ -488,7 +491,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
 	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','5'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
-	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','1']
+	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
