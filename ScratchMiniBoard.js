@@ -361,7 +361,7 @@ function GetCORSJson(url,callback){
         request.abort();//请求中止
         callback(null);	    
 	return;//忽略中止请求    
-    },3000);
+    },6000);
 
     if(request){
         request.onreadystatechange = function () {
