@@ -415,7 +415,7 @@ function GetYeelinkData(sn,device,sensor,callback){
 	+'?&u='+yeelinkurl
 	+'&h='
 	+'&b=';
-	console.log(url);
+	//console.log(url);
 	$.ajax({ 
     	url: url,
       	timeout:8000,
@@ -433,7 +433,7 @@ function GetYeelinkData(sn,device,sensor,callback){
 var YeelinkData =new Array();
 //获取Yeelink的数据
 function GetYeelinkpoll(){
-	console.log(Date.now()+' YeelinkData.length:'+YeelinkData.length);
+	//console.log(Date.now()+' YeelinkData.length:'+YeelinkData.length);
 	for(var i=0;i<YeelinkData.length;i++){
 		GetYeelinkData(i,YeelinkData[i].device,YeelinkData[i].sensor,function(sn,data){
 			YeelinkData[sn].value=data.value;
@@ -507,7 +507,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','50'],
+	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','55'],
             ['r', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
 	],
