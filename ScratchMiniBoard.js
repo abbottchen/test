@@ -471,8 +471,8 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	+'&h=U-ApiKey:'+appid
 	+'&b={"value": '+value+'}'
 	console.log(yurl);
-	AJAX_JSON(yurl,5000,function(data){
-		console.log("设置完成")
+	AJAX_JSON(yurl,10000,function(data){
+		console.log("设置完成");
 	});
 };
 	
