@@ -338,38 +338,40 @@
 /******************************************************/ 
 /*跨域访问的通用代码*/
 /******************************************************/  	
-function createCORS(method, url){
-    var xhr = new XMLHttpRequest();
-    if('withCredentials' in xhr){
-        xhr.open(method, url, true);
-    }else if(typeof XDomainRequest != 'undefined'){
-        var xhr = new XDomainRequest();
-        xhr.open(method, url);
-    }else{
-        xhr = null;
-    }
-    return xhr;
-}
-
 function StrToJSON(str) {
  json = eval('('+str+')');
  return json;
 }
 
 function GetCORSJson(url,callback){
-	var request = createCORS('get', url);	
+	var request = new XMLHttpRequest();
+    if('withCredentials' in request){
+        request.open('get', url, true);
+    }else if(typeof XDomainRequest != 'undefined'){
+        var request = new XDomainRequest();
+        request.open('get', url);
+    }else{
+        return;
+    }
+    //超时控制
+	var time = false;//是否超时
+    var timer = setTimeout(function(){
+        time = true;
+        request.abort();//请求中止
+    },3000);
+
 	if(request){
 		request.onreadystatechange = function () {
-			if(request.readyState == 4){
-				if(request.status >= 200 && request.status < 304 || request.status == 304){
-					//console.log(request.responseText);
-					callback(request.responseText);
-				}
-	 		}
-		}
-	    request.send();
-	}	
-}
+			if(request.readyState !==4) return;//忽略未完成的请求
+			if(time) return;//忽略中止请求
+			clearTimeout(timer);//取消等待的超时
+			if(request.status == 200)
+				callback(request.responseText);
+			}
+	}
+	request.send(null);	
+}	
+	
 
 var VPS_url='http://23.106.137.114:5000/';
 var IotSetTime = {};	
@@ -478,7 +480,7 @@ ext.SetYeelink = function(appid,device,sensor,value){
 	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
 	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','5'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
-	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','55']
+	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','1']
 	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
