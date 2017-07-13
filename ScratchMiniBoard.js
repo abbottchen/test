@@ -462,7 +462,7 @@ ext.GetYeelink = function(device,sensor) {
 		},
 		error: function(XMLHttpRequest, textStatus){
 				console.log('Error:'+textStatus);
-				ret="";
+				//ret="";
 			},
 		});	
   		//console.log('Ajax return:'+ret);
