@@ -444,20 +444,29 @@ function GetYeelinkpoll(){
 }
 	
 ext.GetYeelink = function(device,sensor) {
-	var sn=YeelinkData.length;
-	if(sn==0){//启动循环服务
-	  setInterval(GetYeelinkpoll, 10000);
-	}
-	for(var i=0;i<sn;i++){
-		if(YeelinkData[i].device==device&&YeelinkData[i].sensor==sensor){
-			//console.log('返回:'+YeelinkData[i].value);
-			return YeelinkData[i].value;
-		}
-	}	
-	YeelinkData[sn]={device: 0, sensor:0, value:null,time: Date.now()};
-	YeelinkData[sn].device=device;
-	YeelinkData[sn].sensor=sensor;
-	return '';
+	var	yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoints'
+	var url=VPS_url+'get'
+	+'?&u='+yeelinkurl
+	+'&h='
+	+'&b=';
+	console.log(url);
+	var ret;
+	$.ajax({ 
+    		url: url,
+    		async: false,
+		timeout:8000,
+		type: 'GET',
+		dataType: 'json',
+		success: function(data) { 
+			ret=parseFloat(data.value);
+		},
+		error: function(XMLHttpRequest, textStatus){
+				console.log('Error:'+textStatus);
+				ret="";
+			},
+		});	
+  		//console.log('Ajax return:'+ret);
+   	 return ret;
 }	
 
 ext.SetYeelink = function(appid,device,sensor,value){
