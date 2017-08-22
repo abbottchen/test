@@ -272,7 +272,7 @@ function fetchEnvicloudCitycode(city,callback){
      	type: 'GET',
      	dataType: 'json',
       	success: function(data) { 
-      		console.log('城市代码:'+data.citycode);
+      		console.log('获取城市代码:'+data.citycode);
       		EnvicloudCitycodeCached[city]=data.citycode;
       		callback(data.citycode)
       	},
@@ -287,7 +287,7 @@ function fetchEnvicloudCitycode(city,callback){
 var EnvicloudWeatherCached = {};
 function fetchEnvicloudWeather(city,callback){
 	if (city in EnvicloudWeatherCached && Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
-		console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
+		console.log('取缓冲的气候数据:'+EnvicloudWeatherCached[city].data); 
       		callback(EnvicloudWeatherCached[city].data);
 		return;
     	}
@@ -300,7 +300,7 @@ function fetchEnvicloudWeather(city,callback){
      		type: 'GET',
      		dataType: 'json',
       		success: function(weatherData) { 
-      			console.log('温度:'+weatherData.temperature);
+			console.log('获取气候数据:'+weatherData); 
       			EnvicloudWeatherCached[city] = {data: weatherData, time: Date.now()};
       			callback(weatherData);
       		},
