@@ -257,7 +257,69 @@
 	
   
 /******************************************************/
+/*
+ 以下为获取天气相关函数
+ */
+var EnvicloudWeatherCached = {};
+function fetchEnvicloudWeather(city,callback){
+	if (city in EnvicloudWeatherCached &&Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
+      		//Weather data is cached
+			console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
+      		callback(EnvicloudWeatherCached[city].data);
+    }
+	
+	fetchEnvicloudCitycode(city,function(citycode){
+		var	url='http://service.envicloud.cn:8082/v2/weatherlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
+		$.ajax({ 
+    		url: url,
+      		timeout:5000,
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(weatherData) { 
+      			console.log('温度:'+weatherData.temperature);
+      			EnvicloudWeatherCached[city] = {data: weatherData, time: Date.now()};
+      			callback(weatherData);
+      		},
+      		error: function(XMLHttpRequest, textStatus){
+				console.log('Error:'+textStatus);
+			},
+  		});
+	});
+}
 
+
+function getEnvicloudWeatherDataFromJSOP(type,weatherData){
+	var val = null;
+    switch (type) {
+      	case '温度'://气温(℃) 
+       	 	val = weatherData.temperature;
+        	break;
+        case '体感温度'://体感温度(℃) 
+       	 	val = weatherData.feelst;
+        	break;
+      	case '湿度'://相对湿度(%) 
+        	val = weatherData.humidity;
+        	break;
+      	case '风速'://风速(m/s
+        	val = weatherData.windspeed;
+        	break;
+		case '大气压'://气压(hPa) 
+        	val = weatherData.airpressure;	
+        	break;
+        case '降雨量'://降雨量(mm)
+        	val = weatherData.rain;				
+        	break;
+   	} 
+    return val;
+}	
+
+ext_GetEnvicloudWeather=function(city,type,callback){
+	fetchEnvicloudWeather(city,function(data) {
+		var ret=getEnvicloudWeatherDataFromJSOP(type,data);
+		console.log('返回值：'+ret); 
+		callback(ret);
+	});
+};
 	
 /******************************************************/	
   ext.resetAll = function(){};	
