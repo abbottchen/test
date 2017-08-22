@@ -266,7 +266,6 @@ function fetchEnvicloudWeather(city,callback){
       		//Weather data is cached
 			console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
       		callback(EnvicloudWeatherCached[city].data);
-			return;
     }
 	
 	fetchEnvicloudCitycode(city,function(citycode){
