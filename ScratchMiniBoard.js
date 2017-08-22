@@ -262,10 +262,11 @@
  */
 var EnvicloudWeatherCached = {};
 function fetchEnvicloudWeather(city,callback){
-	if (city in EnvicloudWeatherCached &&Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
+	/*
+	if (city in EnvicloudWeatherCached && Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
 		console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
       		callback(EnvicloudWeatherCached[city].data);
-    	}
+    	}*/
 	
 	fetchEnvicloudCitycode(city,function(citycode){
 		var	url='http://service.envicloud.cn:8082/v2/weatherlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
