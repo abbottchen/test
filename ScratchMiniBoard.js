@@ -354,7 +354,7 @@ ext.GetEnvicloudWeather=function(city,type,callback){
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
-	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','77'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','88'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
