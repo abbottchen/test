@@ -256,206 +256,329 @@
     };
 	
   
-    /******************************************************/
-    var cacheDuration = 1800000 //ms, 30 minutes
-    var cachedTemps = {};
+/******************************************************/
 
-    function getWeatherDataFromJSOP(type , weatherData) {
-    	var val = null;
-    	//console.log('温度:'+weatherData.main.temp);  
-    	//console.log('湿度:'+weatherData.main.humidity);
-    	//console.log('风速:'+weatherData.wind.speed);
-	//console.log('大气压:'+weatherData.main.pressure);
-    	switch (type) {
-      	case '温度':
-       	 	val = weatherData.main.temp;			//单位：摄氏度
-        break;
-      	case '湿度':
-        	val = weatherData.main.humidity;
-        break;
-      	case '风速':
-        	val = weatherData.wind.speed;			//单位m/
-        break;
-	case '大气压':
-        	val = weatherData.main.pressure/10;		// 单位kPa
-        break;
-	case '经度':
-        	val = weatherData.coord.lon;
-	break;
-	case '纬度':
-        	val = weatherData.coord.lat;
-	break;			
-   	}
-	//console.log('getWeatherDataFromJSOP'+val);  
-    	return val;
-  }
-    
-     function fetchWeatherData(APPID,location,callback) {
-    	if (location in cachedTemps &&
-        	Date.now() - cachedTemps[location].time < cacheDuration) {
-      		//Weather data is cached
-		console.log('取缓冲区:'+cachedTemps[location].data); 
-      		callback(cachedTemps[location].data);
-		return;
-    	}
-    	// Make an AJAX call to the Open Weather Maps API
-    	$.ajax({ 
-      		url: 'http://api.openweathermap.org/data/2.5/weather',
-     		 data: {q: location, units: 'metric', appid:APPID},
-      		dataType: 'jsonp',
-      		success: function(weatherData) {
-		console.log('ajax返回数据:'+weatherData); 	
-        	//Received the weather data. Cache and return the data.
-        	cachedTemps[location] = {data: weatherData, time: Date.now()};
-		callback(weatherData);	
-      		}
-    	});
-     }
-    
-  ext.getWeather = function(APPID,location, type, callback) {
-    fetchWeatherData(APPID,location, function(data) {
-      	var val = getWeatherDataFromJSOP(type,data);
-      	callback(val);
-    });
-  };
-	
-/******************************************************/ 
-/*跨域访问的通用代码*/
-/******************************************************/  	
-var VPS_url='http://23.106.137.114:5000/';
 var IotSetTime = {};
-function AJAX_JSON(url,timeout,callback)
-{
-	$.ajax({ 
-    	url: url,
-      	timeout:timeout,
-     	type: 'GET',
-     	dataType: 'json',
-      	success: function(data) {
-			console.log('ajax返回数据:'+data); 
-			callback(data);
-      	},
-      	error: function(XMLHttpRequest, textStatus){
-			console.log('Error:'+textStatus);
-	},
-   });	
-}
-	
 function CheckIotTimeInterval(type,ms){
 	if (type in IotSetTime &&Date.now() - IotSetTime[type].time < ms) {
-		console.log('时间未到:'+(Date.now() - IotSetTime['Lewei'].time)/1000);
+		console.log('时间未到:'+(Date.now() - IotSetTime[type].time)/1000);
 		return false;
-    	}
+    }
 	else{
 		IotSetTime[type] = {time: Date.now()};
 		return true;
 	}
-}	
-/******************************************************/ 
-/*获取和设置乐为物联上的传感器数据*/
-/******************************************************/   	
-function fetchLeiweiData(appid, callback) {
-    	// Make an AJAX call to the Open Weather Maps API
-    	$.ajax({ 
-      		url: 'http://www.lewei50.com/api/V1/user/getSensorsWithGateway',
-     		data: {userkey: appid},
-     		type: 'GET',
-     		dataType: 'jsonp',
-      		success: function(LeiweiData) {
-			//console.log('ajax返回数据:'+LeiweiData); 
-			callback(LeiweiData);
-      		}
-    	});
-} 
+}
+
+
+/*
+ 以下为获取城市代码相关函数
+ */
+var EnvicloudCitycodeCached = {};
+function fetchEnvicloudCitycode(city,callback){
+	if (city in EnvicloudCitycodeCached){
+		console.log('缓存的城市代码:'+EnvicloudCitycodeCached[city]);
+		callback(EnvicloudCitycodeCached[city]);
+	}
 	
-ext.GetLewei = function(appid , idName, sensorid,callback) {
-    fetchLeiweiData(appid, function(json) { 
-    	for(var i=0;i<json.length;i++){
-	  if(json[i].idName==idName){
-             var device=json[i];
-              //console.log('找到设备:'+device.idName);
-             for(var j=0;j<device.sensors.length;j++){
-                //console.log('传感器:'+device.sensors[j].idName);
-                if(device.sensors[j].idName==sensorid){
-                   console.log('传感器值:'+device.sensors[j].value);
-                   //return device.sensors[j].value;
-                   callback(device.sensors[j].value);
-                }
-             }
-           }
-        }
-    });
-};
-	
-	
-ext.SetLewei = function(appid , idName, sensorid, value) {
-	//15s内不得连续发送请求
-	if(CheckIotTimeInterval('Lewei',15000)==false)
-		return
-		
-	var	Leweiurl='http://www.lewei50.com/api/V1/gateway/UpdateSensors/'+idName
-	var url=VPS_url+'post'
-	+'?&u='+Leweiurl
-	+'&h=userkey:'+appid
-	+'&b=[{"Name":"'+sensorid+'","Value":"'+value+'"}]'
-	console.log(url);
-	
-	AJAX_JSON(url,5000,function(data){
-		console.log("设置完成"+data);
-		console.log(data.Successful);
-	});
-};
-/******************************************************/ 
-/*获取和设置Yeelink上的传感器数据*/
-/******************************************************/  
-var YeelinkCached = {};	
-ext.GetYeelink = function(device,sensor,callback) {
-	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
-	var sensorname={device:sensor};
-	if (sensorname in YeelinkCached){
-		var time=Date.now() - YeelinkCached[sensorname].time;
-		//console.log('当前时间:'+Date.now());
-        	//console.log('记录时间:'+YeelinkCached[sensorname].time);	
-        	//console.log('时间差:'+time);	
-		if(time<5000){//5000s内的读取操作，为读取缓冲区
-			console.log('取缓冲区:'+YeelinkCached[sensorname].data); 
-			callback(YeelinkCached[sensorname].data);
-			return;
-		}
-    	}
-      	
+	var	Envicloudurl='http://service.envicloud.cn:8082/v2/citycode/YWJIB3R0MTUWMDUYNTQ2MZEZNA=='+'/'+city
 	$.ajax({ 
-		url: yeelinkurl,
-		timeout:5000,
-		type: 'GET',
-		dataType: 'json',
-		success: function(data) { 
-			console.log('Yeelink传感器值:'+data.value);
-			YeelinkCached[sensorname] = {data: data.value, time: Date.now()};
-			callback(data.value);
-		},
-		error: function(XMLHttpRequest, textStatus){
+    	url: Envicloudurl,
+      	timeout:5000,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) { 
+      		console.log('城市代码:'+data.citycode);
+      		EnvicloudCitycodeCached[city]=data.citycode;
+      		callback(data.citycode)
+      	},
+      	error: function(XMLHttpRequest, textStatus){
 			console.log('Error:'+textStatus);
-			callback(YeelinkCached[sensorname].data);
 		},
- 	});	
+  });	
+}
+
+/*
+ 以下为获取天气相关函数
+ */
+var EnvicloudWeatherCached = {};
+function fetchEnvicloudWeather(city,callback){
+	if (city in EnvicloudWeatherCached &&Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
+      		//Weather data is cached
+			console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
+      		callback(EnvicloudWeatherCached[city].data);
+    }
+	
+	fetchEnvicloudCitycode(city,function(citycode){
+		var	url='http://service.envicloud.cn:8082/v2/weatherlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
+		$.ajax({ 
+    		url: url,
+      		timeout:5000,
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(weatherData) { 
+      			console.log('温度:'+weatherData.temperature);
+      			EnvicloudWeatherCached[city] = {data: weatherData, time: Date.now()};
+      			callback(weatherData);
+      		},
+      		error: function(XMLHttpRequest, textStatus){
+				console.log('Error:'+textStatus);
+			},
+  		});
+	});
+}
+
+
+function getEnvicloudWeatherDataFromJSOP(type,weatherData){
+	/*
+rcode Int 结果码 
+rdesc String 结果描述 
+updatetime String 更新时间 
+phenomena String 天气现象 
+temperature String 气温(℃) 
+feelst String 体感温度(℃) 
+airpressure String 气压(hPa) 
+humidity String 相对湿度(%) 
+rain String 降雨量(mm) 
+winddirect String 风向 
+windpower String 风力 
+windspeed String 风速(m/s) 
+	 */
+	var val = null;
+    switch (type) {
+      	case '温度'://气温(℃) 
+       	 	val = weatherData.temperature;
+        	break;
+        case '体感温度'://体感温度(℃) 
+       	 	val = weatherData.feelst;
+        	break;
+      	case '湿度'://相对湿度(%) 
+        	val = weatherData.humidity;
+        	break;
+      	case '风速'://风速(m/s
+        	val = weatherData.windspeed;
+        	break;
+		case '大气压'://气压(hPa) 
+        	val = weatherData.airpressure;	
+        	break;
+        case '降雨量'://降雨量(mm)
+        	val = weatherData.rain;				
+        	break;
+   	} 
+    return val;
 }	
 
-ext.SetYeelink = function(appid,device,sensor,value){
+
+
+ext.GetEnvicloudWeather=function(city,type,callback){
+	fetchEnvicloudWeather(city,function(data) {
+		var ret=getEnvicloudWeatherDataFromJSOP(type,data);
+		console.log('返回值：'+ret); 
+		callback(ret);
+	});
+};
+
+/*
+ 以下为获取空气质量相关函数
+ */
+var EnvicloudAirCached = {};
+function fetchEnvicloudAir(city,callback){
+	if (city in EnvicloudAirCached &&Date.now() - EnvicloudAirCached[city].time < 1800000) {
+      		//Weather data is cached
+		console.log('取缓冲区:'+EnvicloudAirCached[city].data); 
+      		callback(EnvicloudAirCached[city].data);
+    	}
+	
+	fetchEnvicloudCitycode(city,function(citycode){
+		var	url='http://service.envicloud.cn:8082/v2/cityairlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
+		$.ajax({ 
+    		url: url,
+      		timeout:5000,
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(airData) { 
+      			EnvicloudAirCached[city] = {data: airData, time: Date.now()};
+      			callback(airData);
+      		},
+      		error: function(XMLHttpRequest, textStatus){
+				console.log('Error:'+textStatus);
+			},
+  		});
+	});
+}
+
+function getEnvicloudAirDataFromJSOP(type,airData){
+	/*
+rcode	Int	结果码
+rdesc	String	结果描述
+citycode	String	城市编码
+time	String	时间(yyyyMMddHH)
+AQI	String	空气质量指数
+PM25	String	PM2.5浓度(μg/m3)
+PM10	String	PM10浓度(μg/m3)
+CO	String	一氧化碳浓度(mg/m3)
+SO2	String	二氧化硫浓度(μg/m3)
+NO2	String	二氧化氮浓度(μg/m3)
+o3	String	臭氧浓度(μg/m3)
+primary	String	首要污染物
+	 */
+	var val = null;
+    switch (type) {
+    	case '空气质量指数'://空气质量指数
+    		val = airData.AQI;
+    		break;
+      	case 'PM2.5'://PM2.5浓度(μg/m3)
+       	 	val = airData.PM25;			
+        	break;
+      	case 'PM10'://PM10浓度(μg/m3)					
+        	val = airData.PM10;
+        	break;
+        case '一氧化碳浓度'://一氧化碳浓度(mg/m3)					
+        	val = airData.CO;
+        	break;	
+      	case '二氧化硫浓度'://二氧化硫浓度(μg/m3)
+        	val = airData.SO2;	
+        	break;
+        case '二氧化氮浓度'://二氧化氮浓度(μg/m3)
+        	val = airData.NO2;	
+        	break;	
+		case '臭氧浓度'://臭氧浓度(μg/m3)
+        	val = airData.o3;
+        	break;		
+   	}
+    return val;
+}	
+
+
+ext.GetEnvicloudAir=function(city,type,callback){
+	fetchEnvicloudAir(city,function(data) {
+		var ret=getEnvicloudAirDataFromJSOP(type,data);
+		console.log('返回值：'+ret); 
+		callback(ret);
+	});
+};
+
+
+
+var YeelinkCached = {};
+//获取Yeelink的数据
+ext.GetYeelink=function (device,sensor,callback){
+	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
+	
+	if ({device:sensor} in YeelinkCached){
+		var time=Date.now() - YeelinkCached[{device:sensor}].time;
+		if(time<5000){
+			console.log('取缓冲区:'+YeelinkCached[{device:sensor}].data); 
+			callback(YeelinkCached[{device:sensor}].data);
+		}
+    }
+      	
+	$.ajax({ 
+    	url: yeelinkurl,
+      	timeout:10000,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) { 
+      		ret=parseFloat(data.value);
+      		console.log('Yeelink传感器值:'+data.value);
+      		YeelinkCached[{device:sensor}] = {data: data.value, time: Date.now()};
+      		callback(data.value);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  });	
+}
+
+/*
+设置Yeelink的数据
+ */
+ext.SetYeelink= function(device,sensor,value){
 	//15s内不得连续发送请求
 	if(CheckIotTimeInterval('Yeelink',15000)==false)
 		return;
-		
-	var yeelinkurl='http://api.yeelink.net/v1.0/device/'+device+'/sensor/'+sensor+'/datapoint'
-	var yurl=VPS_url+'post'
-	+'?&u='+yeelinkurl
-	+'&h=U-ApiKey:'+appid
-	+'&b={"value": '+value+'}'
-	console.log(yurl);
-	AJAX_JSON(yurl,10000,function(data){
-		console.log("设置完成");
-	});
+	
+	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
+	var ret;
+	$.ajax({ 
+    	url: yeelinkurl,
+    	async: false,
+      	timeout:5000,
+     	type: 'post',
+     	data: '{"value": '+value+'}',
+     	dataType: 'json',
+      	success: function(data) { 
+      		;
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  });	
+}
+
+
+/*
+获取乐为物联的数据
+ */
+function fetchLeiweiData(callback) {
+    	$.ajax({ 
+    		url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(LeiweiData) {
+				callback(LeiweiData);
+      		}
+    	});
+}  
+
+function getLeiweiDataFromJSOP(idName,sensorid,json){
+	for(var i=0;i<json.length;i++){
+		if(json[i].idName==idName){
+			var device=json[i];
+			for(var j=0;j<device.sensors.length;j++){
+				if(device.sensors[j].idName==sensorid){
+					console.log('传感器值:'+device.sensors[j].value);
+					return device.sensors[j].value;
+				}
+			}
+		}
+	}
+}
+
+ext.GetLewei=function(idName, sensorid,callback) {
+    fetchLeiweiData(function(json) { 
+    	var ret=getLeiweiDataFromJSOP(idName,sensorid,json);
+    	console.log('返回值：'+ret); 
+    	callback(ret);
+    });
 };
+
+
+
+
+ext.SetLewei=function(idName, sensorid, value) {
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Lewei',15000)==false)
+		return
+	
+	var	Leweiurl='http://localhost:9000/lewei/gateway/UpdateSensors/'+idName;
+	$.ajax({ 
+    	url: Leweiurl,
+    	async: false,
+      	timeout:5000,
+     	type: 'post',
+     	data: '[{"Name":"'+sensorid+'","Value":"'+value+'"}]',
+     	dataType: 'json',
+      	success: function(data) { 
+      		console.log(data.Successful);
+      		console.log(data.Message);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  });	
+}
+	
 	
 /******************************************************/	
   ext.resetAll = function(){};	
@@ -486,11 +609,12 @@ ext.SetYeelink = function(appid,device,sensor,value){
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
-	    ['R', 'APPID %s 城市%s %m.WeatherDataType 值 ', 'getWeather', '960f7f58abbc5c98030d1899739c1ba8','Beijing', '温度'],
-	    ['R', '获取乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值','GetLewei', 'bed12be663' ,'01' , 'Humidity'],
-	    [' ', '设置乐为物联APPID %s 设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei', 'bed12be663' ,'01' ,'Humidity','44'],
+	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
+	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
+	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','44'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
-	    [' ', '设置Yeelink apikey %s 设备为 %s  传感器为 %s 的值为 %n','SetYeelink','57f36d198515f6e4c090187c4c9ab54b','12094' ,'403236','0']
+	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
         menus: {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
@@ -498,7 +622,8 @@ ext.SetYeelink = function(appid,device,sensor,value){
   	    DigitalIOOutType:['低','高'],
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
-	    WeatherDataType:['温度', '湿度', '风速','大气压','经度','纬度']
+	    WeatherDataType:['温度', '体感温度','湿度', '风速','大气压','降雨量'],
+	    AirDataType:['空气质量指数', 'PM2.5','PM10', '一氧化碳浓度','二氧化硫浓度','二氧化氮浓度','臭氧浓度'],
         },
         url: 'https://abbottchen.github.io/test/ScratchMiniBoard.js'
     };
