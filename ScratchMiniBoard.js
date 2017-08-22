@@ -262,6 +262,7 @@ function fetchEnvicloudCitycode(city,callback){
 	if (city in EnvicloudCitycodeCached){
 		console.log('缓存的城市代码:'+EnvicloudCitycodeCached[city]);
 		callback(EnvicloudCitycodeCached[city]);
+		return;
 	}
 	
 	var	Envicloudurl='http://service.envicloud.cn:8082/v2/citycode/YWJIB3R0MTUWMDUYNTQ2MZEZNA=='+'/'+city
@@ -288,6 +289,7 @@ function fetchEnvicloudWeather(city,callback){
 	if (city in EnvicloudWeatherCached && Date.now() - EnvicloudWeatherCached[city].time < 3000000) {
 		console.log('取缓冲区:'+EnvicloudWeatherCached[city].data); 
       		callback(EnvicloudWeatherCached[city].data);
+		return;
     	}
 	
 	fetchEnvicloudCitycode(city,function(citycode){
