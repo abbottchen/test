@@ -278,7 +278,7 @@ function fetchEnvicloudCitycode(city,callback){
       	error: function(XMLHttpRequest, textStatus){
 			console.log('Error:'+textStatus);
 		},
-  });	
+  	});	
 }	
 /*
  以下为获取天气相关函数
