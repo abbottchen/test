@@ -409,6 +409,85 @@ ext.GetEnvicloudAir=function(city,type,callback){
 		callback(ret);
 	});
 };
+	
+/*
+获取乐为物联的数据
+ */
+function fetchLeiweiData(callback) {
+    	$.ajax({ 
+    		url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(LeiweiData) {
+				callback(LeiweiData);
+      		}
+    	});
+}  
+
+function getLeiweiDataFromJSOP(idName,sensorid,json){
+	for(var i=0;i<json.length;i++){
+		if(json[i].idName==idName){
+			var device=json[i];
+			for(var j=0;j<device.sensors.length;j++){
+				if(device.sensors[j].idName==sensorid){
+					console.log('传感器值:'+device.sensors[j].value);
+					return device.sensors[j].value;
+				}
+			}
+		}
+	}
+}
+
+ext.GetLewei=function(idName, sensorid,callback) {
+    fetchLeiweiData(function(json) { 
+    	var ret=getLeiweiDataFromJSOP(idName,sensorid,json);
+    	console.log('返回值：'+ret); 
+    	callback(ret);
+    });
+};
+
+
+
+/*
+设置乐为物联的数据
+ */
+var IotSetTime = {};
+function CheckIotTimeInterval(type,ms){
+	if (type in IotSetTime &&Date.now() - IotSetTime[type].time < ms) {
+		console.log('时间未到:'+(Date.now() - IotSetTime[type].time)/1000);
+		return false;
+    }
+	else{
+		IotSetTime[type] = {time: Date.now()};
+		return true;
+	}
+}
+	
+ext.SetLewei=function(idName, sensorid, value) {
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Lewei',15000)==false)
+		return
+	
+	var	Leweiurl='http://localhost:9000/lewei/gateway/UpdateSensors/'+idName;
+	$.ajax({ 
+    	url: Leweiurl,
+    	async: false,
+      	timeout:5000,
+     	type: 'post',
+     	data: '[{"Name":"'+sensorid+'","Value":"'+value+'"}]',
+     	dataType: 'json',
+      	success: function(data) { 
+      		console.log(data.Successful);
+      		console.log(data.Message);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  });	
+}
+	
+	
+	
 /******************************************************/	
   ext.resetAll = function(){};	
 
@@ -441,7 +520,7 @@ ext.GetEnvicloudAir=function(city,type,callback){
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
-	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','44'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','66'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
