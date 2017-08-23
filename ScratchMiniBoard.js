@@ -517,7 +517,7 @@ ext.GetYeelink=function (device,sensor,callback){
      	dataType: 'json',
       	success: function(data) { 
       		ret=parseFloat(data.value);
-      		console.log('Yeelink传感器值:'+data.value);
+      		console.log('取Yeelink传感器值:'+data.value);
       		YeelinkCached[{device:sensor}] = {data: data.value, time: Date.now()};
       		callback(data.value);
       	},
