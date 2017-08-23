@@ -506,6 +506,7 @@ ext.GetYeelink=function (device,sensor,callback){
 		if(time<YeelinkGetInterval){
 			console.log('取缓冲区:'+YeelinkCached[{device:sensor}].data); 
 			callback(YeelinkCached[{device:sensor}].data);
+			return;
 		}
     	}
       	
