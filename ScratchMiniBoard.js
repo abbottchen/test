@@ -1,4 +1,10 @@
 // This is an extension for development and testing of the Scratch Javascript Extension API.
+var LeiWeiTimeout=5000;		//乐为物联的通信超时时间
+var YeelinkTimeout=5000;	//Yeelin的通信超时时间
+var YunSetInterval=15000;	//云服务器上参数设置间隔时间
+var EnvicloudTimeout=10000;	//环境云通信超时时间
+var ReadEnvicloudInterval=3000000;//50分钟读取一次
+
 
 (function(ext) {
     var UART_REV_FRAME_LEN=9;
@@ -268,7 +274,7 @@ function fetchEnvicloudCitycode(city,callback){
 	var	Envicloudurl='http://service.envicloud.cn:8082/v2/citycode/YWJIB3R0MTUWMDUYNTQ2MZEZNA=='+'/'+city
 	$.ajax({ 
     	url: Envicloudurl,
-      	timeout:5000,
+      	timeout:EnvicloudTimeout,
      	type: 'GET',
      	dataType: 'json',
       	success: function(data) { 
@@ -296,7 +302,7 @@ function fetchEnvicloudWeather(city,callback){
 		var	url='http://service.envicloud.cn:8082/v2/weatherlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
 		$.ajax({ 
     		url: url,
-      		timeout:5000,
+      		timeout:EnvicloudTimeout,
      		type: 'GET',
      		dataType: 'json',
       		success: function(weatherData) { 
@@ -360,11 +366,11 @@ function fetchEnvicloudAir(city,callback){
 		var	url='http://service.envicloud.cn:8082/v2/cityairlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
 		$.ajax({ 
     		url: url,
-      		timeout:5000,
+      		timeout:EnvicloudTimeout,
      		type: 'GET',
      		dataType: 'json',
       		success: function(airData) { 
-			console.log('取云服务器空气质量:'+EnvicloudAirCached[city].data); 
+			console.log('取云服务器空气质量:'+airData); 
       			EnvicloudAirCached[city] = {data: airData, time: Date.now()};
       			callback(airData);
       		},
@@ -419,6 +425,7 @@ function fetchLeiweiData(callback) {
     		url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
      		type: 'GET',
      		dataType: 'json',
+		timeout:LeiWeiTimeout,
       		success: function(LeiweiData) {
 				callback(LeiweiData);
       		}
@@ -466,14 +473,14 @@ function CheckIotTimeInterval(type,ms){
 	
 ext.SetLewei=function(idName, sensorid, value) {
 	//15s内不得连续发送请求
-	if(CheckIotTimeInterval('Lewei',15000)==false)
+	if(CheckIotTimeInterval('Lewei',YunSetInterval)==false)
 		return
 	
 	var	Leweiurl='http://localhost:9000/lewei/gateway/UpdateSensors/'+idName;
 	$.ajax({ 
     	url: Leweiurl,
     	async: false,
-      	timeout:5000,
+      	timeout:LeiWeiTimeout,
      	type: 'post',
      	data: '[{"Name":"'+sensorid+'","Value":"'+value+'"}]',
      	dataType: 'json',
