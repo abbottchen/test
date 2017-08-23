@@ -1,7 +1,8 @@
 // This is an extension for development and testing of the Scratch Javascript Extension API.
 var LeiWeiTimeout=5000;		//乐为物联的通信超时时间
+var LeiWeiGetInterval=8000;	//LeiWei获取参数的间隔时间
 var YeelinkTimeout=5000;	//Yeelink的通信超时时间
-var YeelinkGetInterval=5000;	//Yeelink获取参数的间隔时间
+var YeelinkGetInterval=8000;	//Yeelink获取参数的间隔时间
 var YunSetInterval=15000;	//云服务器上参数设置间隔时间
 var EnvicloudTimeout=10000;	//环境云通信超时时间
 var ReadEnvicloudInterval=3000000;//50分钟读取一次
@@ -428,7 +429,7 @@ function fetchLeiweiData(callback) {
      		dataType: 'json',
 		timeout:LeiWeiTimeout,
       		success: function(LeiweiData) {
-				callback(LeiweiData);
+			callback(LeiweiData);
       		}
     	});
 }  
