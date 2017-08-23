@@ -255,7 +255,7 @@
         }, 500);
     };
 	
-  
+
 /******************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
@@ -345,6 +345,69 @@ ext.GetEnvicloudWeather=function(city,type,callback){
 	});
 };
 	
+/*
+ 以下为获取空气质量相关函数
+ */
+var EnvicloudAirCached = {};
+function fetchEnvicloudAir(city,callback){
+	if (city in EnvicloudAirCached &&Date.now() - EnvicloudAirCached[city].time < 3000000) {
+      		//Weather data is cached
+		console.log('取缓冲区:'+EnvicloudAirCached[city].data); 
+      		callback(EnvicloudAirCached[city].data);
+    	}
+	fetchEnvicloudCitycode(city,function(citycode){
+		var	url='http://service.envicloud.cn:8082/v2/cityairlive/YWJIB3R0MTUWMDUYNTQ2MZEZNA==/'+citycode;
+		$.ajax({ 
+    		url: url,
+      		timeout:5000,
+     		type: 'GET',
+     		dataType: 'json',
+      		success: function(airData) { 
+      			EnvicloudAirCached[city] = {data: airData, time: Date.now()};
+      			callback(airData);
+      		},
+      		error: function(XMLHttpRequest, textStatus){
+				console.log('Error:'+textStatus);
+			},
+  		});
+	});
+}
+
+function getEnvicloudAirDataFromJSOP(type,airData){
+	var val = null;
+    switch (type) {
+    	case '空气质量指数'://空气质量指数
+    		val = airData.AQI;
+    		break;
+      	case 'PM2.5'://PM2.5浓度(μg/m3)
+       	 	val = airData.PM25;			
+        	break;
+      	case 'PM10'://PM10浓度(μg/m3)					
+        	val = airData.PM10;
+        	break;
+        case '一氧化碳浓度'://一氧化碳浓度(mg/m3)					
+        	val = airData.CO;
+        	break;	
+      	case '二氧化硫浓度'://二氧化硫浓度(μg/m3)
+        	val = airData.SO2;	
+        	break;
+        case '二氧化氮浓度'://二氧化氮浓度(μg/m3)
+        	val = airData.NO2;	
+        	break;	
+		case '臭氧浓度'://臭氧浓度(μg/m3)
+        	val = airData.o3;
+        	break;		
+   	}
+    return val;
+}	
+
+ext.GetEnvicloudAir=function(city,type,callback){
+	fetchEnvicloudAir(city,function(data) {
+		var ret=getEnvicloudAirDataFromJSOP(type,data);
+		console.log('返回值：'+ret); 
+		callback(ret);
+	});
+};
 /******************************************************/	
   ext.resetAll = function(){};	
 
@@ -377,7 +440,7 @@ ext.GetEnvicloudWeather=function(city,type,callback){
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
-	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','22'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','33'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
