@@ -1,6 +1,7 @@
 // This is an extension for development and testing of the Scratch Javascript Extension API.
 var LeiWeiTimeout=5000;		//乐为物联的通信超时时间
-var YeelinkTimeout=5000;	//Yeelin的通信超时时间
+var YeelinkTimeout=5000;	//Yeelink的通信超时时间
+var YeelinkGetInterval=5000;	//Yeelink获取参数的间隔时间
 var YunSetInterval=15000;	//云服务器上参数设置间隔时间
 var EnvicloudTimeout=10000;	//环境云通信超时时间
 var ReadEnvicloudInterval=3000000;//50分钟读取一次
@@ -494,8 +495,62 @@ ext.SetLewei=function(idName, sensorid, value) {
   });	
 }
 	
+
+var YeelinkCached = {};
+//获取Yeelink的数据
+ext.GetYeelink=function (device,sensor,callback){
+	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
 	
+	if ({device:sensor} in YeelinkCached){
+		var time=Date.now() - YeelinkCached[{device:sensor}].time;
+		if(time<YeelinkGetInterval){
+			console.log('取缓冲区:'+YeelinkCached[{device:sensor}].data); 
+			callback(YeelinkCached[{device:sensor}].data);
+		}
+    	}
+      	
+	$.ajax({ 
+    	url: yeelinkurl,
+      	timeout:YeelinkTimeout,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) { 
+      		ret=parseFloat(data.value);
+      		console.log('Yeelink传感器值:'+data.value);
+      		YeelinkCached[{device:sensor}] = {data: data.value, time: Date.now()};
+      		callback(data.value);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+	},
+  });	
+}
+
+/*
+设置Yeelink的数据
+ */
+ext.SetYeelink= function(device,sensor,value){
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Yeelink',YunSetInterval)==false)
+		return;
 	
+	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
+	var ret;
+	$.ajax({ 
+    		url: yeelinkurl,
+    		async: false,
+      		timeout:YeelinkTimeout,
+     		type: 'post',
+     		data: '{"value": '+value+'}',
+     		dataType: 'json',
+      		success: function(data) { 
+      			;
+      		},
+      		error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  	});	
+}
 /******************************************************/	
   ext.resetAll = function(){};	
 
@@ -528,7 +583,7 @@ ext.SetLewei=function(idName, sensorid, value) {
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
-	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','66'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','11'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
