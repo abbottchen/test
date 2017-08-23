@@ -364,6 +364,7 @@ function fetchEnvicloudAir(city,callback){
      		type: 'GET',
      		dataType: 'json',
       		success: function(airData) { 
+			console.log('取云服务器空气质量:'+EnvicloudAirCached[city].data); 
       			EnvicloudAirCached[city] = {data: airData, time: Date.now()};
       			callback(airData);
       		},
