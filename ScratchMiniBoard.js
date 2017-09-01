@@ -243,7 +243,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         device = potentialDevices.shift();
         if (!device) return;
 	
-	console.log('serial port name:' +device);	    
+	console.log('serial port name:' +device.toString());	    
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 	    var rawData = new Uint8Array(data);	
