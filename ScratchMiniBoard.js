@@ -422,14 +422,13 @@ ext.GetEnvicloudAir=function(city,type,callback){
 获取乐为物联的数据
  */
 var  LeiweiCached = {};
-var  LeiweiCachedFlag='last';
 function fetchLeiweiData(callback) {
 	//在一定时间内部不得连续获取乐为网络上的数据
-	if (LeiweiCachedIndex in LeiweiCached){
-		var time=Date.now() - LeiweiCached[LeiweiCachedFlag].time;
+	if ('last' in LeiweiCached){
+		var time=Date.now() - LeiweiCached['last'].time;
 		if(time<LeiWeiGetInterval){
-			console.log('取缓冲区:'+LeiweiCached[LeiweiCachedFlag].data); 
-			callback(LeiweiCached[LeiweiCachedFlag].data);
+			console.log('取缓冲区:'+LeiweiCached['last'].data); 
+			callback(LeiweiCached['last'].data);
 			return;
 		}
    	}
@@ -439,7 +438,7 @@ function fetchLeiweiData(callback) {
      	dataType: 'json',
 		timeout:LeiWeiTimeout,
       	success: function(LeiweiData) {
-      		LeiweiCached[LeiweiCachedFlag] = {data: LeiweiData, time: Date.now()};
+      		LeiweiCached['last'] = {data: LeiweiData, time: Date.now()};
 			callback(LeiweiData);
       	}
     });	
@@ -595,7 +594,7 @@ ext._getStatus = function() {
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
-	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','44'],
+	    [' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','55'],
             ['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    [' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0']
 	],
