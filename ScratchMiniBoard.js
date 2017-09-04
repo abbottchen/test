@@ -469,7 +469,6 @@ ext.GetLewei=function(idName, sensorid,callback) {
 };
 
 
-
 /*
 设置乐为物联的数据
  */
@@ -535,9 +534,9 @@ ext.GetYeelink=function (device,sensor,callback){
       		callback(data.value);
       	},
       	error: function(XMLHttpRequest, textStatus){
-		console.log('Error:'+textStatus);
-	},
-  });	
+			console.log('Error:'+textStatus);
+		},
+  	});	
 }
 
 /*
@@ -551,39 +550,37 @@ ext.SetYeelink= function(device,sensor,value){
 	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
 	var ret;
 	$.ajax({ 
-    		url: yeelinkurl,
-    		async: false,
-      		timeout:YeelinkTimeout,
-     		type: 'post',
-     		data: '{"value": '+value+'}',
-     		dataType: 'json',
-      		success: function(data) { 
-      			;
-      		},
-      		error: function(XMLHttpRequest, textStatus){
+    	url: yeelinkurl,
+    	async: false,
+      	timeout:YeelinkTimeout,
+     	type: 'post',
+     	data: '{"value": '+value+'}',
+     	dataType: 'json',
+      	success: function(data) { 
+      		;
+      	},
+      	error: function(XMLHttpRequest, textStatus){
 			console.log('Error:'+textStatus);
 		},
   	});	
 }
 /******************************************************/	
-  ext.resetAll = function(){};	
+ext.resetAll = function(){};	
+ext._deviceRemoved = function(dev) {
+    if(device != dev) return;
+    device = null;
+};
 
-    ext._deviceRemoved = function(dev) {
-        if(device != dev) return;
-        device = null;
-    };
+ ext._shutdown = function() {
+    if(device) device.close();
+    device = null;
+};
 
-    ext._shutdown = function() {
-        if(device) device.close();
-        device = null;
-    };
-
-    ext._getStatus = function() {
+ext._getStatus = function() {
         //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
         //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
-	    
         return {status: 2, msg: 'ScratchMiniBoard connected'};
-    }	
+}	
 	
 /******************************************************/
     var descriptor = {
