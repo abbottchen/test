@@ -243,25 +243,24 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         device = potentialDevices.shift();
         if (!device) return;
 	
-	console.log('serial port name:' +device.toString());	    
+		console.log('serial port name:' +device.toString());	    
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
-	    var rawData = new Uint8Array(data);	
-	    //console.log('Received size' + data.byteLength);	
-            //放置接收的数据到环形缓冲区
-            for(var i=0;i<data.byteLength;i++)
-            {
-		//console.log(rawData[i]);
-		GetFrame(rawData[i]);  
-            }
-        });
+		    var rawData = new Uint8Array(data);	
+		    //console.log('Received size' + data.byteLength);	
+	        //放置接收的数据到环形缓冲区
+	        for(var i=0;i<data.byteLength;i++){
+				//console.log(rawData[i]);
+				GetFrame(rawData[i]);  
+	        }
+    	});
 
-        watchdog = setTimeout(function() {
-            device.set_receive_handler(null);
-            device.close();
-            device = null;
-            tryNextDevice();
-        }, 500);
+   		watchdog = setTimeout(function() {
+	        device.set_receive_handler(null);
+	        device.close();
+	        device = null;
+	        tryNextDevice();
+	    }, 500);
     };
 	
 /******************************************************/
@@ -359,11 +358,11 @@ ext.GetEnvicloudWeather=function(city,type,callback){
 var EnvicloudAirCached = {};
 function fetchEnvicloudAir(city,callback){
 	if (city in EnvicloudAirCached &&Date.now() - EnvicloudAirCached[city].time < 3000000) {
-      		//Weather data is cached
+      	//Weather data is cached
 		console.log('取缓冲区:'+EnvicloudAirCached[city].data); 
-      		callback(EnvicloudAirCached[city].data);
+      	callback(EnvicloudAirCached[city].data);
 		return;
-    	}
+    }
 	fetchEnvicloudCitycode(city,function(citycode){
 		var	url='http://service.envicloud.cn:8082/v2/cityairlive/YWJIB3R0X2NOZW4XNTAZNJMWODYZNTQ3/'+citycode;
 		$.ajax({ 
@@ -404,7 +403,7 @@ function getEnvicloudAirDataFromJSOP(type,airData){
         case '二氧化氮浓度'://二氧化氮浓度(μg/m3)
         	val = airData.NO2;	
         	break;	
-	case '臭氧浓度'://臭氧浓度(μg/m3)
+		case '臭氧浓度'://臭氧浓度(μg/m3)
         	val = airData.o3;
         	break;		
    	}
@@ -433,7 +432,7 @@ function fetchLeiweiData(callback) {
 			callback(LeiweiCached[LeiweiCachedFlag].data);
 			return;
 		}
-   }
+   	}
     $.ajax({ 
     	url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
      	type: 'GET',
@@ -520,7 +519,7 @@ ext.GetYeelink=function (device,sensor,callback){
 			callback(YeelinkCached[{device:sensor}].data);
 			return;
 		}
-    	}
+    }
       	
 	$.ajax({ 
     	url: yeelinkurl,
@@ -579,7 +578,7 @@ ext._deviceRemoved = function(dev) {
 ext._getStatus = function() {
         //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
         //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
-        return {status: 2, msg: 'ScratchMiniBoard connected'};
+    return {status: 2, msg: 'ScratchMiniBoard connected'};
 }	
 	
 /******************************************************/
