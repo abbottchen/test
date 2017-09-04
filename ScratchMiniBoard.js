@@ -564,7 +564,9 @@ ext.SetYeelink= function(device,sensor,value){
   	});	
 }
 /******************************************************/	
-ext.resetAll = function(){};	
+ext.resetAll = function(){
+	
+};
 ext._deviceRemoved = function(dev) {
     if(device != dev) return;
     device = null;
