@@ -424,27 +424,27 @@ ext.GetEnvicloudAir=function(city,type,callback){
 获取乐为物联的数据
  */
 var  LeiweiCached = {};
-var  LeiweiCachedIndex=0;
+var  LeiweiCachedFlag='last';
 function fetchLeiweiData(callback) {
+	//在一定时间内部不得连续获取乐为网络上的数据
 	if (LeiweiCachedIndex in LeiweiCached){
-		var time=Date.now() - LeiweiCached[LeiweiCachedIndex].time;
-		if(time<YeelinkGetInterval){
-			console.log('取缓冲区:'+YeelinkCached[{device:sensor}].data); 
-			callback(YeelinkCached[{device:sensor}].data);
+		var time=Date.now() - LeiweiCached[LeiweiCachedFlag].time;
+		if(time<LeiWeiGetInterval){
+			console.log('取缓冲区:'+LeiweiCached[LeiweiCachedFlag].data); 
+			callback(LeiweiCached[LeiweiCachedFlag].data);
 			return;
 		}
-    	}
-	
-	
-    	$.ajax({ 
-    		url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
-     		type: 'GET',
-     		dataType: 'json',
+   }
+    $.ajax({ 
+    	url:'http://localhost:9000/lewei/'+'user/getSensorsWithGateway',
+     	type: 'GET',
+     	dataType: 'json',
 		timeout:LeiWeiTimeout,
-      		success: function(LeiweiData) {
+      	success: function(LeiweiData) {
+      		LeiweiCached[LeiweiCachedFlag] = {data: LeiweiData, time: Date.now()};
 			callback(LeiweiData);
-      		}
-    	});
+      	}
+    });	
 }  
 
 function getLeiweiDataFromJSOP(idName,sensorid,json){
