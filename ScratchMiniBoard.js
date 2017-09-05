@@ -78,6 +78,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
   	}	
 	
    	function SendFrameToUart(){
+   		if (!device) //无串口不发送数据
+   			return;
 		var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
 		txbuf[0]=0xaa;
 		txbuf[1]=0x0a|0x10;   
@@ -146,6 +148,25 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
 	
+	//设置舵机参数
+	ext.SetServo=function(angle,ch)
+	{
+		if(angle>360)
+			angle=360;
+		else if(angle<0)
+			angle=0;
+			
+		var	tmp=(angle*1000/180)+500);
+		if(tmp<500)
+			tmp=500;
+		else if(tmp>2500)
+			tmp=2500;
+		
+		VarAnalogOutPortPeriod[ch]=20000;//周期20ms
+		VarAnalogOutPortWidth[ch]=Math.round(tmp); //脉冲宽度
+		SendFrameToUart(); 
+	}
+
     function getSensor(which) {
         return inputs[which];
     }
@@ -441,6 +462,14 @@ function fetchLeiweiData(callback) {
       		LeiweiCached['last'] = {data: LeiweiData, time: Date.now()};
 			callback(LeiweiData);
       	}
+      	error: function(XMLHttpRequest, textStatus){
+      		if ('last' in LeiweiCached){
+      			callback(LeiweiCached['last'].data);
+      		}
+      		else{
+      			callback('error');
+      		}
+      	}
     });	
 }  
 
@@ -534,7 +563,12 @@ ext.GetYeelink=function (device,sensor,callback){
       	},
       	error: function(XMLHttpRequest, textStatus){
 			console.log('Error:'+textStatus);
-			callback('error');
+			if ({device:sensor} in YeelinkCached){
+				callback(YeelinkCached[{device:sensor}].data);
+			}
+			else{
+				callback('error');
+			}
 			return;
 		},
   	});	
