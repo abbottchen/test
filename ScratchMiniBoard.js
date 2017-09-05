@@ -562,16 +562,6 @@ ext.GetYeelink=function (device,sensor,callback){
       	},
       	error: function(XMLHttpRequest, textStatus){
 			console.log('Error:'+textStatus);
-<<<<<<< HEAD
-			if ({device:sensor} in YeelinkCached){
-				callback(YeelinkCached[{device:sensor}].data);
-			}
-			else{
-				callback('error');
-			}
-			return;
-=======
->>>>>>> parent of 33742b3... 增加了YEELINK的错误响应
 		},
   	});	
 }
