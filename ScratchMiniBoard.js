@@ -283,9 +283,10 @@ function fetchEnvicloudCitycode(city,callback){
       		EnvicloudCitycodeCached[city]=data.citycode;
       		callback(data.citycode)
       	},
-      	error: function(XMLHttpRequest, textStatus){
-			console.log('Error:'+textStatus);
-		},
+	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+		callback('101010100');
+	}, 
   	});	
 }	
 /*
@@ -297,7 +298,7 @@ function fetchEnvicloudWeather(city,callback){
 		console.log('取缓冲的气候数据:'+EnvicloudWeatherCached[city].data); 
       		callback(EnvicloudWeatherCached[city].data);
 		return;
-    }
+    	}
 	
 	fetchEnvicloudCitycode(city,function(citycode){
 		var	url='http://service.envicloud.cn:8082/v2/weatherlive/YWJIB3R0X2NOZW4XNTAZNJMWODYZNTQ3/'+citycode;
@@ -311,9 +312,10 @@ function fetchEnvicloudWeather(city,callback){
       			EnvicloudWeatherCached[city] = {data: weatherData, time: Date.now()};
       			callback(weatherData);
       		},
-      		error: function(XMLHttpRequest, textStatus){
-				console.log('Error:'+textStatus);
-			},
+		error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+			callback('error');
+		}, 
   		});
 	});
 }
@@ -377,6 +379,7 @@ function fetchEnvicloudAir(city,callback){
       		},
       		error: function(XMLHttpRequest, textStatus){
 				console.log('Error:'+textStatus);
+				callback('error');
 			},
   		});
 	});
@@ -441,6 +444,10 @@ function fetchLeiweiData(callback) {
       		LeiweiCached['last'] = {data: LeiweiData, time: Date.now()};
 			callback(LeiweiData);
       	}
+	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+		callback('error');
+	},    
     });	
 }  
 
@@ -499,9 +506,10 @@ ext.SetLewei=function(idName, sensorid, value) {
       		console.log(data.Successful);
       		console.log(data.Message);
       	},
-      	error: function(XMLHttpRequest, textStatus){
-			console.log('Error:'+textStatus);
-		},
+	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+		callback('error');
+	}, 
   });	
 }
 	
@@ -532,11 +540,10 @@ ext.GetYeelink=function (device,sensor,callback){
       		callback(data.value);
       		return;
       	},
-      	error: function(XMLHttpRequest, textStatus){
-			console.log('Error:'+textStatus);
-			callback('error');
-			return;
-		},
+	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+		callback('error');
+	}, 
   	});	
 }
 
@@ -560,9 +567,10 @@ ext.SetYeelink= function(device,sensor,value){
       	success: function(data) { 
       		;
       	},
-      	error: function(XMLHttpRequest, textStatus){
-			console.log('Error:'+textStatus);
-		},
+	error: function(XMLHttpRequest, textStatus){
+		console.log('Error:'+textStatus);
+		callback('error');
+	}, 
   	});	
 }
 /******************************************************/	
