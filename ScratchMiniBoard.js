@@ -44,7 +44,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'D5': 0,
         'D6': 0
    	};
-	
+		//周期和宽度为两个字节，最大65535，单位us
    	var VarAnalogOutPortPeriod = {
         'PWM1': 0,
         'PWM2': 0
@@ -112,7 +112,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		if(mode=='输出')
         	VarDigitIoPortMode[which]=1; 
 		else
-		VarDigitIoPortMode[which]=0; 
+			VarDigitIoPortMode[which]=0; 
+		
 		SendFrameToUart();    
     }
     ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
@@ -146,6 +147,21 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
 	
+	function SetServoToPram(angle,ch){ 
+		if((angle<0)||(angle>180)
+		   return;
+		
+		var wd=(angle/90+0.5)*1000;
+		wd=Math.round(wd); 
+		
+		console.log('Width:'+wd);   
+	
+		VarAnalogOutPortPeriod[ch]=20000;//周期定死为20ms
+		VarAnalogOutPortWidth[ch]=wd;
+		SendFrameToUart();  
+   	};	
+	ext.SetServo=function(angle,ch){return SetServoToPram(angle,ch); };
+
     function getSensor(which) {
         return inputs[which];
     }
@@ -593,7 +609,7 @@ ext._getStatus = function() {
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
             [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
-	    [' ', '输出 %n (0~360)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
+	    [' ', '输出 %n (0~180)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 	    ['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
