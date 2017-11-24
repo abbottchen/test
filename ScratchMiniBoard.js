@@ -206,6 +206,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
 	
+	/*
 	//设置舵机
 	function SetServoToPram(angle,ch){ 
 		if((angle<0)||(angle>180)
@@ -221,6 +222,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendFrameToUart();  
    	};	
 	ext.SetServo=function(angle,ch){return SetServoToPram(angle,ch); };
+	*/
 	
 	//获取传感器相关数据	
     function getSensorFromFrame(Frame){
