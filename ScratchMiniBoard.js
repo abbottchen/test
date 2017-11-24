@@ -206,10 +206,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
 	
-	/*
+	
 	//设置舵机
 	function SetServoToPram(angle,ch){ 
-		if((angle<0)||(angle>180)
+		if((angle<0)||(angle>180))
 		   return;
 		
 		var wd=(angle/90+0.5)*1000;
@@ -221,8 +221,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		VarAnalogOutPortWidth[ch]=wd;
 		SendFrameToUart();  
    	};	
-	ext.SetServo=function(angle,ch){return SetServoToPram(angle,ch); };
-	*/
+	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
+	
 	
 	//获取传感器相关数据	
     function getSensorFromFrame(Frame){
@@ -615,7 +615,7 @@ ext._getStatus = function() {
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
             ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
-            [' ', '输出 %n ms的周期 %n (0~100%)占空比的信号到模拟输出脚 %m.AnalogOutPortName', 'SetPWMPram', 40 , 50 ,'PWM1'],
+            [' ', '输出周期为 %n ms 占空比为 %n (0~100%)的信号到 %m.AnalogOutPortName 脚', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~180)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    ['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
