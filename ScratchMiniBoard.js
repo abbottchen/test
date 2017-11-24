@@ -107,86 +107,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}	
     }
 	
-    //设置工作模式
-    function SetDigitIoPortMode(which,mode) {
-		if(mode=='输出')
-        	VarDigitIoPortMode[which]=1; 
-		else
-			VarDigitIoPortMode[which]=0; 
-		
-		SendFrameToUart();    
-    }
-    ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
-	
-   function SetDigitIoPortLevel(which,level) {
-		if(level=='高')
-        	VarDigitIoPortLevel[which]=1; 
-		else
-			VarDigitIoPortLevel[which]=0; 
-		SendFrameToUart();  
-    }
-   	ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
-
-   	function SetPWMToPram(period,width,ch){ 
-		period=period*1000;
-		Math.round(period);
-		if(period>65535)
-	 		period=65535;
-		else if(period<0)
-			period=0;
-	   
-		var tmp=period*width/100;
-		tmp=Math.round(tmp); 
-	      
-		console.log('period:'+period);   
-		console.log('Width:'+tmp);   
-	
-		VarAnalogOutPortPeriod[ch]=period;
-		VarAnalogOutPortWidth[ch]=tmp;
-		SendFrameToUart();  
-   	};
-   	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
-	
-	function SetServoToPram(angle,ch){ 
-		if((angle<0)||(angle>180)
-		   return;
-		
-		var wd=(angle/90+0.5)*1000;
-		wd=Math.round(wd); 
-		
-		console.log('Width:'+wd);   
-	
-		VarAnalogOutPortPeriod[ch]=20000;//周期定死为20ms
-		VarAnalogOutPortWidth[ch]=wd;
-		SendFrameToUart();  
-   	};	
-	ext.SetServo=function(angle,ch){return SetServoToPram(angle,ch); };
-
-    function getSensor(which) {
-        return inputs[which];
-    }
-    ext.sensor = function(width) { return getSensor(which); };	
-	
-    function getSensorFromFrame(Frame){
-		inputs['D1']=(Frame[2]>>0)&0x01;
-		inputs['D2']=(Frame[2]>>1)&0x01;    
-    	inputs['D3']=(Frame[2]>>2)&0x01;
-		inputs['D4']=(Frame[2]>>3)&0x01;
-		inputs['D5']=(Frame[2]>>4)&0x01;
-		inputs['D6']=(Frame[2]>>5)&0x01;
-	    
-		var tmp=0;
-		tmp=Frame[3]+(Frame[6]&0x03)*256; 
-		inputs['A1']= (100 * tmp) / 1023;
-		
-		tmp=Frame[4]+((Frame[6]>>2)&0x03)*256;     
-		inputs['A2']= (100 * tmp) / 1023;
-		   
-		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
-		inputs['A3']= (100 * tmp) / 1023;
-    }
-	
-    function GetFrame(ch) {
+	function GetFrame(ch) {
 	 	//AA 95 4F FE FE FE BF 47 16
 	 	if(FrameStep>280)
 			FrameStep=0; 
@@ -242,7 +163,91 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			DataLen=0;
 		}
     }
+	
+    //设置工作模式
+    function SetDigitIoPortMode(which,mode) {
+		if(mode=='输出')
+        	VarDigitIoPortMode[which]=1; 
+		else
+			VarDigitIoPortMode[which]=0; 
+		
+		SendFrameToUart();    
+    }
+    ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
+	
+	//设置IO口电平
+   function SetDigitIoPortLevel(which,level) {
+		if(level=='高')
+        	VarDigitIoPortLevel[which]=1; 
+		else
+			VarDigitIoPortLevel[which]=0; 
+		SendFrameToUart();  
+    }
+   	ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
 
+	//设置PWM
+   	function SetPWMToPram(period,width,ch){ 
+		period=period*1000;
+		Math.round(period);
+		if(period>65535)
+	 		period=65535;
+		else if(period<0)
+			period=0;
+	   
+		var tmp=period*width/100;
+		tmp=Math.round(tmp); 
+	      
+		console.log('period:'+period);   
+		console.log('Width:'+tmp);   
+	
+		VarAnalogOutPortPeriod[ch]=period;
+		VarAnalogOutPortWidth[ch]=tmp;
+		SendFrameToUart();  
+   	};
+   	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
+	
+	//设置舵机
+	function SetServoToPram(angle,ch){ 
+		if((angle<0)||(angle>180)
+		   return;
+		
+		var wd=(angle/90+0.5)*1000;
+		wd=Math.round(wd); 
+		
+		console.log('Width:'+wd);   
+	
+		VarAnalogOutPortPeriod[ch]=20000;//周期定死为20ms
+		VarAnalogOutPortWidth[ch]=wd;
+		SendFrameToUart();  
+   	};	
+	ext.SetServo=function(angle,ch){return SetServoToPram(angle,ch); };
+	
+	//获取传感器相关数据	
+    function getSensorFromFrame(Frame){
+		inputs['D1']=(Frame[2]>>0)&0x01;
+		inputs['D2']=(Frame[2]>>1)&0x01;    
+    	inputs['D3']=(Frame[2]>>2)&0x01;
+		inputs['D4']=(Frame[2]>>3)&0x01;
+		inputs['D5']=(Frame[2]>>4)&0x01;
+		inputs['D6']=(Frame[2]>>5)&0x01;
+	    
+		var tmp=0;
+		tmp=Frame[3]+(Frame[6]&0x03)*256; 
+		inputs['A1']= (100 * tmp) / 1023;
+		
+		tmp=Frame[4]+((Frame[6]>>2)&0x03)*256;     
+		inputs['A2']= (100 * tmp) / 1023;
+		   
+		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
+		inputs['A3']= (100 * tmp) / 1023;
+    }
+	
+    function getSensor(which) {
+        return inputs[which];
+    }
+    ext.sensor = function(width) { return getSensor(which); };	
+
+	
     // Extension API interactions
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
