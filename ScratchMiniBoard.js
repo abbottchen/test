@@ -613,8 +613,7 @@ ext._getStatus = function() {
         blocks: [
             [' ', '设置数字 %m.DigitalIOName 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
-            ['r', '数字脚 %m.DigitalIOName 脚 输入电平', 'sensor', 'D1'],
-            ['r', '模拟输入脚 %m.AnalogInPortName 脚采样值', 'sensor', 'A1'],
+            ['r', ' %m.ALLIOName 脚的输入值', 'sensor', 'D1'],
             [' ', '输出周期为 %n ms 占空比为 %n (0~100%)的信号到 %m.AnalogOutPortName 脚', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    [' ', '输出 %n (0~180)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
 	    ['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
@@ -628,6 +627,7 @@ ext._getStatus = function() {
             DigitalIOName:['D1','D2','D3','D4','D5','D6'],
   	    DigitalIOmode:['输入','输出'],
   	    DigitalIOOutType:['低','高'],
+	    ALLIOName:['D1','D2','D3','D4','D5','D6','A1','A2','A3'],	
   	    AnalogInPortName:['A1','A2','A3'],
   	    AnalogOutPortName:['PWM1','PWM2'],
 	    WeatherDataType:['温度', '体感温度','湿度', '风速','大气压','降雨量'],
