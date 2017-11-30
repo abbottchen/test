@@ -11,12 +11,22 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 (function(ext) {
     var UART_REV_FRAME_LEN=9;
     var device = null;
-
+	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
-    var FrameBuf= new Uint8Array(100);
+    var FrameBuf= new Uint8Array(MAX_FRAME_SZ+5);
     var DataLen=0;
 	
-    var inputs = {
+	//计算一字节的累加和
+	function CalByteCs(buf,sz) {
+		var	sum=0;
+		for(var i=0;i<sz;i++){	
+				sum=Sum+buf[i];
+		}
+		return (sum%256);
+	}
+	/**********************************************************************************/
+	//以下是板子传递给Scratch的数据处理
+	var inputs = {
         'D1': 0,
         'D2': 0,
         'D3': 0,
@@ -25,6 +35,104 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'A2': 0,
         'A3': 0
     };
+
+	//获取传感器相关数据	
+    function getSensorFromFrame(Frame){
+		inputs['D1']=(Frame[2]>>0)&0x01;
+		inputs['D2']=(Frame[2]>>1)&0x01;    
+    	inputs['D3']=(Frame[2]>>2)&0x01;
+		inputs['D4']=(Frame[2]>>3)&0x01;
+		inputs['D5']=(Frame[2]>>4)&0x01;
+		inputs['D6']=(Frame[2]>>5)&0x01;
+	    
+		var tmp=0;
+		tmp=Frame[3]+(Frame[6]&0x03)*256; 
+		inputs['A1']= (100 * tmp) / 1023;
+		
+		tmp=Frame[4]+((Frame[6]>>2)&0x03)*256;     
+		inputs['A2']= (100 * tmp) / 1023;
+		   
+		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
+		inputs['A3']= (100 * tmp) / 1023;
+    }
+	
+    function getSensor(which) {
+        return inputs[which];
+    }
+    ext.sensor = function(width) { return getSensor(which); };	
+	
+	
+	function GetFrame(ch) {
+	 	//AA 95 4F FE FE FE BF 47 16
+	 	if(FrameStep>=MAX_FRAME_SZ)
+			FrameStep=0;    
+        if(FrameStep==0){//等待接收帧头 
+			if(ch==0xaa){
+				FrameStep=1;
+				FrameBuf[0]=ch;
+			}
+		}
+		else if(FrameStep==1){//接收命令  
+	    	FrameStep=2;
+			FrameBuf[1]=ch;
+		}
+		else if(FrameStep==2){//接收长度低8位
+			FrameBuf[2]=ch;
+			FrameStep=3;
+		}
+		else if(FrameStep==3){//接收长度高8位
+			FrameBuf[3]=ch;
+			FrameStep=4;
+			DataLen=FrameBuf[2]+FrameBuf[3]*256;
+			if(DataLen>(MAX_FRAME_SZ-6))
+				FrameStep=0; 
+		}
+		else if((FrameStep>=4)&&(FrameStep<(4+DataLen))){
+			FrameBuf[FrameStep]=ch;
+			FrameStep++;
+		}
+		else if(FrameStep==(4+DataLen)){
+			var cs=CalByteCs(FrameBuf,(DataLen+4));
+			if(cs!=ch){
+				FrameStep=0;
+				DataLen=0;
+				console.log('校验码错误,正确为:'+cs+'错误为:'+ch);
+			}
+			FrameBuf[FrameStep]=ch;
+			FrameStep++;
+		}
+		else if(FrameStep==(5+DataLen)){ 
+			if(ch==0x16){
+				FrameBuf[FrameStep]=ch;
+				FrameStep=0;
+				return (DataLen+6);
+		    }
+		    else{
+				console.log('结束符错误'+ch);
+			}
+			FrameStep=0;
+		}
+		return 0;//未找到正确帧
+    }
+	
+	function BoardToScrath(ch) {
+		if(GetFrame(ch)<=0)
+			return;
+		
+		clearTimeout(watchdog); 
+	    watchdog = null;
+	
+		if(FrameBuf[1]==0x83){
+			getSensorFromFrame(FrameBuf);
+		}
+		else if(FrameBuf[1]==0x84){
+			onsole.log('红外接收命令');
+		}
+	}
+	
+/**********************************************************************************/	
+	
+
 	
    	var VarDigitIoPortMode = {
         'D1': 0,
@@ -49,6 +157,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'PWM': 0
    	};
 
+	
+	
   	function SetDigitIoPortToFrame(prm){	
 		var tmp=0x00;		//mode   
 		if(prm['D1'])
@@ -94,62 +204,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}	
     }
 	
-	function GetFrame(ch) {
-	 	//AA 95 4F FE FE FE BF 47 16
-	 	if(FrameStep>280)
-			FrameStep=0; 
-		//等待接收帧头    
-        if(FrameStep==0){
-			if(ch==0xaa){
-				FrameStep=1;
-				FrameBuf[0]=ch;
-			}
-		}
-		//接收数据长度
-		else if(FrameStep==1){  
-	    	DataLen=ch&0x0f;
-	    	FrameStep=2;
-	    	FrameBuf[1]=ch;
-		}
-		else if((FrameStep>=2)&&(FrameStep<(2+DataLen))){
-			FrameBuf[FrameStep]=ch;
-			FrameStep++;
-		}
-		else if(FrameStep==(2+DataLen)){
-			FrameBuf[FrameStep]=ch;
-			
-			var Sum=0;
-			for(var i=0;i<(2+DataLen);i++){	
-				Sum=Sum+FrameBuf[i];
-			}
-			Sum=Sum%256;
-			//console.log('Sum: ' + Sum);
-			//console.log('ch: ' + ch);
-			if(ch!=Sum)
-			{
-				FrameStep=0;
-				DataLen=0;
-				console.log('累加和错误'+Sum);
-			}
-			else
-			{
-				FrameStep++;
-			}
-		}
-		else if(FrameStep==(3+DataLen)){ 
-			FrameBuf[FrameStep]=ch;
-		    if(ch==0x16){
-				clearTimeout(watchdog); 
-	            watchdog = null;
-				getSensorFromFrame(FrameBuf);
-		    }
-		    else{
-				console.log('结束符错误'+ch);
-			}
-			FrameStep=0;
-			DataLen=0;
-		}
-    }
+	
 	
     //设置工作模式
     function SetDigitIoPortMode(which,mode) {
@@ -209,32 +264,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendFrameToUart();  
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
-	
-	
-	//获取传感器相关数据	
-    function getSensorFromFrame(Frame){
-		inputs['D1']=(Frame[2]>>0)&0x01;
-		inputs['D2']=(Frame[2]>>1)&0x01;    
-    	inputs['D3']=(Frame[2]>>2)&0x01;
-		inputs['D4']=(Frame[2]>>3)&0x01;
-		inputs['D5']=(Frame[2]>>4)&0x01;
-		inputs['D6']=(Frame[2]>>5)&0x01;
-	    
-		var tmp=0;
-		tmp=Frame[3]+(Frame[6]&0x03)*256; 
-		inputs['A1']= (100 * tmp) / 1023;
-		
-		tmp=Frame[4]+((Frame[6]>>2)&0x03)*256;     
-		inputs['A2']= (100 * tmp) / 1023;
-		   
-		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
-		inputs['A3']= (100 * tmp) / 1023;
-    }
-	
-    function getSensor(which) {
-        return inputs[which];
-    }
-    ext.sensor = function(width) { return getSensor(which); };	
+/**********************************************************************************/	
     // Extension API interactions
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
@@ -259,7 +289,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        //放置接收的数据到环形缓冲区
 	        for(var i=0;i<data.byteLength;i++){
 				//console.log(rawData[i]);
-				GetFrame(rawData[i]);  
+				BoardToScrath(rawData[i]);  
 	        }
     	});
 
@@ -271,7 +301,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	    }, 500);
     };
 	
-/******************************************************/
+/**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
 	if (city in EnvicloudCitycodeCached){
@@ -426,9 +456,8 @@ ext.GetEnvicloudAir=function(city,type,callback){
 	});
 };
 	
-/*
-获取乐为物联的数据
- */
+/**********************************************************************************/
+//获取乐为物联的数据
 var  LeiweiCached = {};
 function fetchLeiweiData(callback) {
 	//在一定时间内部不得连续获取乐为网络上的数据
@@ -513,9 +542,9 @@ ext.SetLewei=function(idName, sensorid, value) {
   });	
 }
 	
-
-var YeelinkCached = {};
+/**********************************************************************************/
 //获取Yeelink的数据
+var YeelinkCached = {};
 ext.GetYeelink=function (device,sensor,callback){
 	var	yeelinkurl='http://localhost:9000/yeelink/'+device+'/sensor/'+sensor+'/datapoint'
 	
