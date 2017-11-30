@@ -254,8 +254,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			buf[which]=0; 
 		SendControlCmdToUart();    
     }
-    ext.SetDigitPortMode = function(which,mode) { return SetBoardMode(which,mode,'输出',VarDigitIoPortMode); };
-   	ext.SetDigitPortLevel = function(level,which) { return SetBoardMode(which,level,'高 ’,VarDigitIoPortLevel); };	
+    ext.SetDigitPortMode = function(which,mode) { return SetBoardMode(which,mode,'输出',VarDigitIoPortMode);};
+   	ext.SetDigitPortLevel = function(level,which) { return SetBoardMode(which,level,'高',VarDigitIoPortLevel);};	
 
 	//设置PWM
    	function SetPWMToPram(period,width,ch){ 
