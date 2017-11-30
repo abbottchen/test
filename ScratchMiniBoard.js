@@ -5,7 +5,7 @@ var YeelinkTimeout=12000;	//Yeelink的通信超时时间
 var YeelinkGetInterval=15000;	//Yeelink获取参数的间隔时间
 var YunSetInterval=15000;	//云服务器上参数设置间隔时间
 var EnvicloudTimeout=12000;	//环境云通信超时时间
-var ReadEnvicloudInterval=3000000;//50分钟读取一次
+var ReadEnvicloudInterval=3000000;//50分钟读取一次 
 
 
 (function(ext) {
