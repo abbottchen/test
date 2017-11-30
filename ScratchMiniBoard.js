@@ -9,23 +9,50 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 
 
 (function(ext) {
-    var UART_REV_FRAME_LEN=9;
-    var device = null;
+/**********************************************************************************/
+//以下是对串口的操作
+	var device = null;
+    // Extension API interactions
+    var potentialDevices = [];
+    ext._deviceConnected = function(dev) {
+        potentialDevices.push(dev);
+        if (!device) {
+            tryNextDevice();
+        }
+    }
+    var watchdog = null;
+    function tryNextDevice() {
+        // If potentialDevices is empty, device will be undefined.
+        // That will get us back here next time a device is connected.
+        device = potentialDevices.shift();
+        if (!device) return;
+	
+		console.log('potentialDevices' +potentialDevices);	    
+        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
+        device.set_receive_handler(function(data) {
+		    var rawData = new Uint8Array(data);	
+		    //console.log('Received size' + data.byteLength);	
+	        //放置接收的数据到环形缓冲区
+	        for(var i=0;i<data.byteLength;i++){
+				//console.log(rawData[i]);
+				BoardToScrath(rawData[i]);  
+	        }
+    	});
+
+   		watchdog = setTimeout(function() {
+	        device.set_receive_handler(null);
+	        device.close();
+	        device = null;
+	        tryNextDevice();
+	    }, 500);
+    };	
+/**********************************************************************************/	
+//以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
     var FrameBuf= new Uint8Array(MAX_FRAME_SZ+5);
     var DataLen=0;
-	
-	//计算一字节的累加和
-	function CalByteCs(buf,sz) {
-		var	sum=0;
-		for(var i=0;i<sz;i++){	
-				sum=Sum+buf[i];
-		}
-		return (sum%256);
-	}
-	/**********************************************************************************/
-	//以下是板子传递给Scratch的数据处理
+
 	var inputs = {
         'D1': 0,
         'D2': 0,
@@ -35,16 +62,28 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'A2': 0,
         'A3': 0
     };
-
+	
+ 	function getSensor(which) {
+        return inputs[which];
+    }
+    ext.sensor = function(width) { return getSensor(which); };	
+	
+	//计算一字节的累加和
+	function CalByteCs(buf,sz) {
+		var	sum=0;
+		for(var i=0;i<sz;i++){	
+				sum=Sum+buf[i];
+		}
+		return (sum%256);
+	}
+	
 	//获取传感器相关数据	
     function getSensorFromFrame(Frame){
-		inputs['D1']=(Frame[2]>>0)&0x01;
-		inputs['D2']=(Frame[2]>>1)&0x01;    
-    	inputs['D3']=(Frame[2]>>2)&0x01;
-		inputs['D4']=(Frame[2]>>3)&0x01;
-		inputs['D5']=(Frame[2]>>4)&0x01;
-		inputs['D6']=(Frame[2]>>5)&0x01;
-	    
+		inputs['D1']=(Frame[4]>>0)&0x01;
+		inputs['D2']=(Frame[4]>>1)&0x01;    
+    	inputs['D3']=(Frame[4]>>2)&0x01;
+		inputs['D4']=(Frame[4]>>3)&0x01;
+
 		var tmp=0;
 		tmp=Frame[3]+(Frame[6]&0x03)*256; 
 		inputs['A1']= (100 * tmp) / 1023;
@@ -56,10 +95,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		inputs['A3']= (100 * tmp) / 1023;
     }
 	
-    function getSensor(which) {
-        return inputs[which];
-    }
-    ext.sensor = function(width) { return getSensor(which); };	
+
 	
 	
 	function GetFrame(ch) {
@@ -131,9 +167,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	}
 	
 /**********************************************************************************/	
-	
-
-	
    	var VarDigitIoPortMode = {
         'D1': 0,
         'D2': 0,
@@ -264,43 +297,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendFrameToUart();  
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
-/**********************************************************************************/	
-    // Extension API interactions
-    var potentialDevices = [];
-    ext._deviceConnected = function(dev) {
-        potentialDevices.push(dev);
-        if (!device) {
-            tryNextDevice();
-        }
-    }
-
-    var watchdog = null;
-    function tryNextDevice() {
-        // If potentialDevices is empty, device will be undefined.
-        // That will get us back here next time a device is connected.
-        device = potentialDevices.shift();
-        if (!device) return;
-	
-		console.log('potentialDevices' +potentialDevices);	    
-        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
-        device.set_receive_handler(function(data) {
-		    var rawData = new Uint8Array(data);	
-		    //console.log('Received size' + data.byteLength);	
-	        //放置接收的数据到环形缓冲区
-	        for(var i=0;i<data.byteLength;i++){
-				//console.log(rawData[i]);
-				BoardToScrath(rawData[i]);  
-	        }
-    	});
-
-   		watchdog = setTimeout(function() {
-	        device.set_receive_handler(null);
-	        device.close();
-	        device = null;
-	        tryNextDevice();
-	    }, 500);
-    };
-	
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
