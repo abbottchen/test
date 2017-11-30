@@ -77,15 +77,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[1]=0x0a|0x10;   
 		txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode);
 		txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
-		txbuf[4]=VarAnalogOutPortPeriod['PWM1']%256;		//pwm1
-		txbuf[5]=VarAnalogOutPortPeriod['PWM1']/256;
-		txbuf[6]=VarAnalogOutPortWidth['PWM1']%256;
-		txbuf[7]=VarAnalogOutPortWidth['PWM1']/256;
-		txbuf[8]=VarAnalogOutPortPeriod['PWM2']%256;		//pwm2
-		txbuf[9]=VarAnalogOutPortPeriod['PWM2']/256;
-		txbuf[10]=VarAnalogOutPortWidth['PWM2']%256;   
-		txbuf[11]=VarAnalogOutPortWidth['PWM2']/256;
-		   
+		txbuf[4]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
+		txbuf[5]=VarAnalogOutPortPeriod['PWM']/256;
 		var Sum=0;
 		for(var i=0;i<12;i++){	
 		  Sum=Sum+txbuf[i];
@@ -242,8 +235,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         return inputs[which];
     }
     ext.sensor = function(width) { return getSensor(which); };	
-
-	
     // Extension API interactions
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
@@ -260,7 +251,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         device = potentialDevices.shift();
         if (!device) return;
 	
-		//console.log('serial port name:' +device.toString());	    
+		console.log('potentialDevices' +potentialDevices);	    
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 		    var rawData = new Uint8Array(data);	
