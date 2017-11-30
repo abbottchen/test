@@ -50,7 +50,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 //以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
-    var FrameBuf= new Uint8Array(MAX_FRAME_SZ+5);
+    var FrameBuf= new Uint8Array(MAX_FRAME_SZ+10);
     var DataLen=0;
 
 	var inputs = {
@@ -63,22 +63,36 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'A3': 0
     };
 	
+	var IRRemoteData= new Uint8Array(MAX_FRAME_SZ+10);
+	var	IRRemoteDataLen=0;
+	
  	function getSensor(which) {
         return inputs[which];
     }
     ext.sensor = function(width) { return getSensor(which); };	
+	ext.IRRemoteRx=function() {return IRRemoteData;}
 	
 	//计算一字节的累加和
 	function CalByteCs(buf,sz) {
 		var	sum=0;
 		for(var i=0;i<sz;i++){	
-				sum=Sum+buf[i];
+			sum=Sum+buf[i];
 		}
 		return (sum%256);
 	}
 	
-	//获取传感器相关数据	
-    function getSensorFromFrame(Frame){
+	//获取红外遥控的相关数据	
+    function GetIRDataFromFrame(Frame){
+		IRRemoteDataLen=Frame[2]+Frame[3]*256;
+		if(IRRemoteDataLen>MAX_FRAME_SZ)
+			return;
+		for(var i=0;i<IRRemoteDataLen;i++){
+			IRRemoteData[i]=Frame[4+i];
+		}
+	}
+	
+	//获取传感器的相关数据	
+    function GetSensorFromFrame(Frame){
 		inputs['D1']=(Frame[4]>>0)&0x01;
 		inputs['D2']=(Frame[4]>>1)&0x01;    
     	inputs['D3']=(Frame[4]>>2)&0x01;
@@ -94,10 +108,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
 		inputs['A3']= (100 * tmp) / 1023;
     }
-	
-
-	
-	
+	//每次传递一个字节进来，从而得到一个完整帧
 	function GetFrame(ch) {
 	 	//AA 95 4F FE FE FE BF 47 16
 	 	if(FrameStep>=MAX_FRAME_SZ)
@@ -159,13 +170,13 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	    watchdog = null;
 	
 		if(FrameBuf[1]==0x83){
-			getSensorFromFrame(FrameBuf);
+			GetSensorFromFrame(FrameBuf);
 		}
 		else if(FrameBuf[1]==0x84){
-			onsole.log('红外接收命令');
+			GetIRDataFromFrame(FrameBuf);
+			console.log('红外接收命令');
 		}
 	}
-	
 /**********************************************************************************/	
    	var VarDigitIoPortMode = {
         'D1': 0,
@@ -631,7 +642,7 @@ ext._getStatus = function() {
 	    	['R', '获取乐为物联设备标识为 %s  传感器标识为 %s 的值','GetLewei','01' , 'Humidity'],
 	    	[' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','55'],
         	['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
-	    	[' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','0'],
+	    	[' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
 			[' ', '发送红外遥控编码', 'IRRemoteTx','']
 	],
