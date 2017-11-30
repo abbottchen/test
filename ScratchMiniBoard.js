@@ -47,6 +47,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	    }, 500);
     };	
 /**********************************************************************************/	
+	/*
 //以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
@@ -109,18 +110,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		inputs['A3']= (100 * tmp) / 1023;
     }
 	//每次传递一个字节进来，从而得到一个完整帧
-	/*帧格式如下
-		typedef struct STRUCT_BOARD_TO_SCRATCH_SENSOR_FRAME	
-		{	
-		  uint8	  Head; //帧头
-		  uint8	  CMD;  //
-		  uint16  Len;  //长度	
-		  uint8   DigitPort;              
-		  uint16	ADCPort[3]; 
-		  uint8   Cs;
-		  uint8   End;
-		}STRUCT_BOARD_TO_SCRATCH_SENSOR_FRAME;
-	*/
 	function GetFrame(ch) {
 	 	if(FrameStep>=MAX_FRAME_SZ)
 			FrameStep=0;    
@@ -187,7 +176,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			GetIRDataFromFrame(FrameBuf);
 			console.log('红外接收命令');
 		}
-	}
+	}*/
 /**********************************************************************************/	
    	var VarDigitIoPortMode = {
         'D1': 0,
@@ -235,16 +224,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			tmp=tmp|(1<<7);
 		 return tmp;
   	}	
-	/*
 	//控制命令的应用层格式
-	typedef struct STRUCT_SCRATCH_TO_BOARD_CONTROL_APP_LAYER		
-	{	
-	  uint8   Mode;           //工作模式Bit0 D1口工作模式 =0输入 =1输出
-	  uint8   Level;          //输出电平Bit0 D1口电平 =0低 =1高
-	  uint16  PWM_Period;     //单位us
-	  uint16  PWM_Width;      //单位us
-	}STRUCT_SCRATCH_TO_BOARD_CONTROL_APP_LAYER;
-	*/
    	function SendControlCmdToUart(){
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
 		txbuf[0]=0xaa;
