@@ -109,8 +109,19 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		inputs['A3']= (100 * tmp) / 1023;
     }
 	//每次传递一个字节进来，从而得到一个完整帧
+	/*帧格式如下
+		typedef struct STRUCT_BOARD_TO_SCRATCH_SENSOR_FRAME	
+		{	
+		  uint8	  Head; //帧头
+		  uint8	  CMD;  //
+		  uint16  Len;  //长度	
+		  uint8   DigitPort;              
+		  uint16	ADCPort[3]; 
+		  uint8   Cs;
+		  uint8   End;
+		}STRUCT_BOARD_TO_SCRATCH_SENSOR_FRAME;
+	*/
 	function GetFrame(ch) {
-	 	//AA 95 4F FE FE FE BF 47 16
 	 	if(FrameStep>=MAX_FRAME_SZ)
 			FrameStep=0;    
         if(FrameStep==0){//等待接收帧头 
@@ -183,7 +194,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'D2': 0,
         'D3': 0,
         'D4': 0,
-        'D5': 0
+        'IR': 0
    	};
   	var VarDigitIoPortLevel = {
         'D1': 0,
@@ -220,56 +231,51 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		if(prm['D5'])
 			tmp=tmp|(1<<4);
 		  
-		if(prm['D6'])
-			tmp=tmp|(1<<5);
+		if(prm['IR'])
+			tmp=tmp|(1<<7);
 		 return tmp;
   	}	
-	
-   	function SendFrameToUart(){
-		var txbuf = new Uint8Array([0xaa, 0x02, 0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14]);	
+	/*
+	//控制命令的应用层格式
+	typedef struct STRUCT_SCRATCH_TO_BOARD_CONTROL_APP_LAYER		
+	{	
+	  uint8   Mode;           //工作模式Bit0 D1口工作模式 =0输入 =1输出
+	  uint8   Level;          //输出电平Bit0 D1口电平 =0低 =1高
+	  uint16  PWM_Period;     //单位us
+	  uint16  PWM_Width;      //单位us
+	}STRUCT_SCRATCH_TO_BOARD_CONTROL_APP_LAYER;
+	*/
+   	function SendControlCmdToUart(){
+		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
 		txbuf[0]=0xaa;
-		txbuf[1]=0x0a|0x10;   
-		txbuf[2]=SetDigitIoPortToFrame(VarDigitIoPortMode);
-		txbuf[3]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
-		txbuf[4]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
-		txbuf[5]=VarAnalogOutPortPeriod['PWM']/256;
-		var Sum=0;
-		for(var i=0;i<12;i++){	
-		  Sum=Sum+txbuf[i];
-		}
-		txbuf[12]=Sum%256; 	
-		txbuf[13]=0x16;
-		
+		txbuf[1]=0x84;  
+		txbuf[2]=0x06;
+		txbuf[3]=0x00;
+		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
+		txbuf[5]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
+		txbuf[6]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
+		txbuf[7]=VarAnalogOutPortPeriod['PWM']/256;
+		txbuf[8]=VarAnalogOutPortWidth['PWM']%256;		//pwm1
+		txbuf[9]=VarAnalogOutPortWidth['PWM']/256;
+		txbuf[10]=CalByteCs(txbuf,10); 	
+		txbuf[11]=0x16;
 		console.log('device send'+txbuf.buffer);
-		for(var i=0;i<14;i++)
+		for(var i=0;i<12;i++)
 		{
 			console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}	
     }
-	
-	
-	
-    //设置工作模式
-    function SetDigitIoPortMode(which,mode) {
-		if(mode=='输出')
-        	VarDigitIoPortMode[which]=1; 
+    //设置工作模式和IO口电平
+    function SetBoardMode(which,mode,condition,buf) {
+		if(mode==condition)
+        	buf[which]=1; 
 		else
-			VarDigitIoPortMode[which]=0; 
-		
-		SendFrameToUart();    
+			buf[which]=0; 
+		SendControlCmdToUart();    
     }
-    ext.SetDigitPortMode = function(which,mode) { return SetDigitIoPortMode(which,mode); };
-	
-	//设置IO口电平
-   function SetDigitIoPortLevel(which,level) {
-		if(level=='高')
-        	VarDigitIoPortLevel[which]=1; 
-		else
-			VarDigitIoPortLevel[which]=0; 
-		SendFrameToUart();  
-    }
-   	ext.SetDigitPortLevel = function(level,which) { return SetDigitIoPortLevel(which,level); };	
+    ext.SetDigitPortMode = function(which,mode) { return SetBoardMode(which,mode,'输出',VarDigitIoPortMode); };
+   	ext.SetDigitPortLevel = function(level,which) { return SetBoardMode(which,level,'高 ’,VarDigitIoPortLevel); };	
 
 	//设置PWM
    	function SetPWMToPram(period,width,ch){ 
@@ -288,10 +294,9 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 		VarAnalogOutPortPeriod[ch]=period;
 		VarAnalogOutPortWidth[ch]=tmp;
-		SendFrameToUart();  
+		SendControlCmdToUart();  
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
-	
 	
 	//设置舵机
 	function SetServoToPram(angle,ch){ 
@@ -305,7 +310,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 		VarAnalogOutPortPeriod[ch]=20000;//周期定死为20ms
 		VarAnalogOutPortWidth[ch]=wd;
-		SendFrameToUart();  
+		SendControlCmdToUart();  
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
 /**********************************************************************************/
@@ -648,7 +653,7 @@ ext._getStatus = function() {
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
-            DigitalInOutPort:['D1','D2','D3','D4'],
+            DigitalInOutPort:['D1','D2','D3','D4','IR'],
 			DigitalOutPort:['D1','D2','D3','D4','D5'],
   	    	DigitalIOmode:['输入','输出'],
   	    	DigitalIOOutType:['低','高'],	
