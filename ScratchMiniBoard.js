@@ -21,8 +21,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'D2': 0,
         'D3': 0,
         'D4': 0,
-        'D5': 0,
-        'D6': 0,
         'A1': 0,
         'A2': 0,
         'A3': 0
@@ -33,26 +31,22 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'D2': 0,
         'D3': 0,
         'D4': 0,
-        'D5': 0,
-        'D6': 0
+        'D5': 0
    	};
   	var VarDigitIoPortLevel = {
         'D1': 0,
         'D2': 0,
         'D3': 0,
         'D4': 0,
-        'D5': 0,
-        'D6': 0
+        'D5': 0
    	};
 		//周期和宽度为两个字节，最大65535，单位us
    	var VarAnalogOutPortPeriod = {
-        'PWM1': 0,
-        'PWM2': 0
+        'PWM': 0
    	};
 	
    	var VarAnalogOutPortWidth = {
-        'PWM1': 0,
-        'PWM2': 0
+        'PWM': 0
    	};
 
   	function SetDigitIoPortToFrame(prm){	
@@ -612,7 +606,7 @@ ext._getStatus = function() {
     var descriptor = {
         blocks: [
         	[' ', '设置数字 %m.DigitalInOutPort 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
-            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalIOName 脚', 'SetDigitPortLevel', '低', 'D1'],
+            [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalOutPort 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', ' %m.AllInPort 脚的输入值', 'sensor', 'D1'],
             [' ', '输出周期为 %n ms 占空比为 %n (0~100%)的信号到 %m.AnalogOutPortName 脚', 'SetPWMPram', 40 , 50 ,'PWM1'],
 	    	[' ', '输出 %n (0~180)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM1'],
