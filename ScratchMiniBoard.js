@@ -177,6 +177,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}
 	}
 /**********************************************************************************/	
+	/*
    	var VarDigitIoPortMode = {
         'D1': 0,
         'D2': 0,
@@ -295,28 +296,9 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	function SendIRDataToBoard(data){ 
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		console.log(data);
-		console.log('data.len'+data.len);
-		/*
-		txbuf[0]=0xaa;
-		txbuf[1]=0x84;  
-		txbuf[2]=0x06;
-		txbuf[3]=0x00;
-		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
-		txbuf[5]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
-		txbuf[6]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
-		txbuf[7]=VarAnalogOutPortPeriod['PWM']/256;
-		txbuf[8]=VarAnalogOutPortWidth['PWM']%256;		//pwm1
-		txbuf[9]=VarAnalogOutPortWidth['PWM']/256;
-		txbuf[10]=CalByteCs(txbuf,10); 	
-		txbuf[11]=0x16;
-		console.log('device send'+txbuf.buffer);
-		for(var i=0;i<12;i++)
-		{
-			console.log(txbuf[i]);
-			device.send(new Uint8Array([txbuf[i]]).buffer);
-		}*/	
+		console.log('data.len'+data.len);	
     }
-	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);
+	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);*/
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
