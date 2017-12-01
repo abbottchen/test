@@ -316,7 +316,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}*/	
     }
-	ext.IRRemoteTx=function(data){SendIRDataToBoard};
+	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
@@ -653,7 +653,7 @@ ext._getStatus = function() {
         	['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    	[' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码', 'IRRemoteTx','']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','1']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
