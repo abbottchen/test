@@ -47,7 +47,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	    }, 500);
     };	
 /**********************************************************************************/	
-	/*
 //以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
@@ -176,7 +175,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			GetIRDataFromFrame(FrameBuf);
 			console.log('红外接收命令');
 		}
-	}*/
+	}
 /**********************************************************************************/	
    	var VarDigitIoPortMode = {
         'D1': 0,
@@ -200,8 +199,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	var VarAnalogOutPortWidth = {
         'PWM': 0
    	};
-
-	
 	
   	function SetDigitIoPortToFrame(prm){	
 		var tmp=0x00;		//mode   
@@ -228,7 +225,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	function SendControlCmdToUart(){
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
 		txbuf[0]=0xaa;
-		txbuf[1]=0x84;  
+		txbuf[1]=0x83;  
 		txbuf[2]=0x06;
 		txbuf[3]=0x00;
 		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
@@ -293,6 +290,33 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendControlCmdToUart();  
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
+	
+	//发送红外数据给板子
+	function SendIRDataToBoard(data){ 
+		var txbuf = new Uint8Array(MAX_FRAME_SZ);
+		console.log(data);
+		console.log('data.len'+data.len);
+		/*
+		txbuf[0]=0xaa;
+		txbuf[1]=0x84;  
+		txbuf[2]=0x06;
+		txbuf[3]=0x00;
+		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
+		txbuf[5]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
+		txbuf[6]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
+		txbuf[7]=VarAnalogOutPortPeriod['PWM']/256;
+		txbuf[8]=VarAnalogOutPortWidth['PWM']%256;		//pwm1
+		txbuf[9]=VarAnalogOutPortWidth['PWM']/256;
+		txbuf[10]=CalByteCs(txbuf,10); 	
+		txbuf[11]=0x16;
+		console.log('device send'+txbuf.buffer);
+		for(var i=0;i<12;i++)
+		{
+			console.log(txbuf[i]);
+			device.send(new Uint8Array([txbuf[i]]).buffer);
+		}*/	
+    }
+	ext.IRRemoteTx=function(data){SendIRDataToBoard};
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
