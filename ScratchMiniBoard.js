@@ -77,7 +77,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}	 
 		else{
 			var Ret= new Uint8Array(IRRemoteDataLen);
-			for(var i=0;i<sz;i++){	
+			for(var i=0;i<IRRemoteDataLen;i++){	
 				Ret[i]=IRRemoteData[i];
 			}
 			return Ret
@@ -88,7 +88,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	function CalByteCs(buf,sz) {
 		var	sum=0;
 		for(var i=0;i<sz;i++){	
-			sum=Sum+buf[i];
+			sum=sum+buf[i];
 		}
 		return (sum%256);
 	}
@@ -189,7 +189,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}
 	}
 /**********************************************************************************/	
-	/*
+	
    	var VarDigitIoPortMode = {
         'D1': 0,
         'D2': 0,
@@ -306,11 +306,13 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 	//发送红外数据给板子
 	function SendIRDataToBoard(data){ 
-		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		console.log(data);
-		console.log('data.len'+data.len);	
+		if(data.length>MAX_FRAME_SZ)
+			return;
+		var txbuf = new Uint8Array(data.length);
+		console.log('txbuf:'+txbuf);
     }
-	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);*/
+	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
