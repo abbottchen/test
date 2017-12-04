@@ -190,7 +190,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}
 	}*/
 /**********************************************************************************/	
-	
+/*
    	var VarDigitIoPortMode = {
         'D1': 0,
         'D2': 0,
@@ -314,6 +314,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		console.log('txbuf:'+txbuf);
     }
 	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);
+	*/
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
