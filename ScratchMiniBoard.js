@@ -47,7 +47,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	    }, 500);
     };	
 /**********************************************************************************/	
-	/*
+	
 //以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
     var	FrameStep=0;
@@ -188,7 +188,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			GetIRDataFromFrame(FrameBuf);
 			console.log('红外接收命令');
 		}
-	}*/
+	}
 /**********************************************************************************/	
 /*
    	var VarDigitIoPortMode = {
