@@ -71,7 +71,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
     }
     ext.sensor = function(width) { return getSensor(which); };	
 	ext.IRRemoteRx=function() {
-		if IRRemoteDataLen>MAX_FRAME_SZ){
+		if (IRRemoteDataLen>MAX_FRAME_SZ){
 			var Ret= new Uint8Array(0);
 			return Ret;
 		}	 
