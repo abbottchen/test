@@ -333,7 +333,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendControlCmdToUart();  
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
-	/*
+	
 	//发送红外数据给板子
 	function SendIRDataToBoard(data){ 
 		console.log(data);
@@ -342,8 +342,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		var txbuf = new Uint8Array(data.length);
 		console.log('txbuf:'+txbuf);
     }
-	ext.IRRemoteTx=function(data){SendIRDataToBoard(data);
-	*/
+	ext.IRRemoteTx=function(data){SendIRDataToBoard(data); };
 /**********************************************************************************/
 var EnvicloudCitycodeCached = {};
 function fetchEnvicloudCitycode(city,callback){
