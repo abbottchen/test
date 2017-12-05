@@ -190,7 +190,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}
 	}
 /**********************************************************************************/	
-/*
+
    	var VarDigitIoPortMode = {
         'D1': 0,
         'D2': 0,
@@ -288,7 +288,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		SendControlCmdToUart();  
    	};
    	ext.SetPWMPram=function(period,width,ch) { return SetPWMToPram(period,width,ch); };
-	
+	/*
 	//设置舵机
 	function SetServoToPram(angle,ch){ 
 		if((angle<0)||(angle>180))
