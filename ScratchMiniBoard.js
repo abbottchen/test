@@ -30,6 +30,14 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 		console.log('potentialDevices' +potentialDevices);	    
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
+		
+		var Buf= new Uint8Array(10);
+		for(var i=0;i<10;i++){
+			Buf[i]=0xaa+i;
+			console.log(Buf[i]);
+			device.send(new Uint8Array([Buf[i]]).buffer);
+		}
+		
         device.set_receive_handler(function(data) {
 		    var rawData = new Uint8Array(data);	
 		    console.log('Received size' + data.byteLength);	
