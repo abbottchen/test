@@ -21,6 +21,27 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         }
     }
     var watchdog = null;
+	//调试用，找到一个能打开的串口就可以
+    function tryNextDevice() {
+        // If potentialDevices is empty, device will be undefined.
+        // That will get us back here next time a device is connected.
+        device = potentialDevices.shift();
+        if (!device) return;
+	
+		console.log('potentialDevices' +potentialDevices);	    
+        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
+        device.set_receive_handler(function(data) {
+		    var rawData = new Uint8Array(data);	
+		    console.log('Received size' + data.byteLength);	
+	        //放置接收的数据到环形缓冲区
+	        for(var i=0;i<data.byteLength;i++){
+				console.log(rawData[i]);
+				BoardToScrath(rawData[i]);  
+	        }
+    	});
+    };	
+	
+	/*
     function tryNextDevice() {
         // If potentialDevices is empty, device will be undefined.
         // That will get us back here next time a device is connected.
@@ -45,7 +66,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        device = null;
 	        tryNextDevice();
 	    }, 500);
-    };	
+    };	*/
 /**********************************************************************************/	
 	
 //以下是对板子到Scratch传递数据的处理	
