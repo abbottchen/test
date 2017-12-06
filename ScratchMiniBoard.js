@@ -354,7 +354,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	//发送红外数据给板子
 	function SendIRDataToBoard(text){ 
 		console.log(text);
-		var	strs-new Array();
+		var	strs=new Array();
 		strs=text.split(",");
 		if(strs.length>(MAX_FRAME_SZ/2))
 			return;
