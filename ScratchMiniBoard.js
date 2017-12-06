@@ -345,11 +345,21 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
 	
 	//发送红外数据给板子
-	function SendIRDataToBoard(data){ 
-		console.log(data);
-		if(data.length>MAX_FRAME_SZ)
+	function SendIRDataToBoard(text){ 
+		console.log(text);
+		var	strs-new Array();
+		strs=text.split(",");
+		if(strs.length>(MAX_FRAME_SZ/2))
 			return;
-		var txbuf = new Uint8Array(data.length);
+		
+		var txbuf = new Uint8Array(MAX_FRAME_SZ);
+		for(var i=0;i<strs.length;i++){
+			var tmp=parseInt(strs[i]);
+			txbuf[2*i+0]=tmp/256;
+			txbuf[2*i+1]=tmp%256;
+			console.log(txbuf[2*i+0]);
+			console.log(txbuf[2*i+1]);
+		}
 		console.log('txbuf:'+txbuf);
     }
 	ext.IRRemoteTx=function(data){SendIRDataToBoard(data); };
@@ -689,7 +699,7 @@ ext._getStatus = function() {
         	['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    	[' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码 %n', 'IRRemoteTx','2,2']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1160']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
