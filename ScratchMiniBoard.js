@@ -93,42 +93,14 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'A3': 0
     };
 	
-	var IRRemoteData= new Uint8Array(MAX_FRAME_SZ);
-	var	IRRemoteDataLen=0;
+	var	IRText= "1,2";
 	
  	function getSensor(which) {
         return inputs[which];
     }
     ext.sensor = function(width) { return getSensor(which); };	
 	ext.IRRemoteRx=function() {
-	/*
-		if (IRRemoteDataLen>MAX_FRAME_SZ){
-			var Ret= new Uint8Array(0);
-			return Ret;
-		}	 
-		else{
-			var Ret= new Uint8Array(IRRemoteDataLen);
-			for(var i=0;i<IRRemoteDataLen;i++){	
-				Ret[i]=IRRemoteData[i];
-			}
-			return Ret
-		}
-	*/
-		var IRData= "";
-		IRRemoteData[0]=0x30;
-		IRRemoteData[1]=0x31;
-		IRRemoteData[2]=0x32;
-		IRRemoteData[3]=0x33;
-		IRRemoteData[4]=0x34;
-		IRRemoteData[5]=0x35;
-		IRRemoteDataLen=6;
-		for(var i=0;i<(IRRemoteDataLen/2);i++)
-		{
-			var	tmp=IRRemoteData[2*i+0]*256+IRRemoteData[2*i+1];
-			IRData=IRData+tmp.toString()+',';
-		}
-		console.log('红外接收数据：'+IRRemoteData);
-		return IRData;
+		return IRText;
 	}
 	
 	//计算一字节的累加和
@@ -141,12 +113,16 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	}
 	
 	//获取红外遥控的相关数据	
-    function GetIRDataFromFrame(Frame){
-		IRRemoteDataLen=Frame[2]+Frame[3]*256;
-		if(IRRemoteDataLen>MAX_FRAME_SZ)
+    function GetIRDataFromFrame(Frame){	
+		var Len=Frame[2]*256+Frame[3];
+		if(Len>MAX_FRAME_SZ)
 			return;
-		for(var i=0;i<IRRemoteDataLen;i++){
-			IRRemoteData[i]=Frame[4+i];
+		IRText= "";
+		for(var i=0;i<Len;i=i+2){
+			var tmp=Frame[4+i]*256+Frame[5+i];
+			IRText=IRText+tmp.toString();
+			if(i<(DataLen-2))
+				IRText=IRText+',';
 		}
 	}
 	
@@ -188,7 +164,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		else if(FrameStep==3){//接收长度高8位
 			FrameBuf[3]=ch;
 			FrameStep=4;
-			DataLen=FrameBuf[2]+FrameBuf[3]*256;
+			DataLen=FrameBuf[2]*256+FrameBuf[3];
 			if(DataLen>(MAX_FRAME_SZ-6))
 				FrameStep=0; 
 		}
@@ -286,8 +262,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
 		txbuf[0]=0xaa;
 		txbuf[1]=0x83;  
-		txbuf[2]=0x06;
-		txbuf[3]=0x00;
+		txbuf[2]=0x00;
+		txbuf[3]=0x06;
 		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
 		txbuf[5]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
 		txbuf[6]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
@@ -362,10 +338,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		for(var i=0;i<strs.length;i++){
 			var tmp=parseInt(strs[i]);
-			txbuf[2*i+0]=tmp/256;
-			txbuf[2*i+1]=tmp%256;
-			console.log(txbuf[2*i+0]);
-			console.log(txbuf[2*i+1]);
+			txbuf[2*i+4]=tmp/256;
+			txbuf[2*i+5]=tmp%256;
+			console.log(txbuf[2*i+4]);
+			console.log(txbuf[2*i+5]);
 		}
 		console.log('txbuf:'+txbuf);
     }
