@@ -218,7 +218,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'D2': 0,
         'D3': 0,
         'D4': 0,
-        'IR': 0
+        'IR': 1
    	};
   	var VarDigitIoPortLevel = {
         'D1': 0,
@@ -345,14 +345,14 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			var tmp=parseInt(strs[i]);
 			txbuf[2*i+4]=tmp/256;
 			txbuf[2*i+5]=tmp%256;
-			console.log(txbuf[2*i+4]);
-			console.log(txbuf[2*i+5]);
+			//console.log(txbuf[2*i+4]);
+			//console.log(txbuf[2*i+5]);
 		}
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
 		
-		console.log('device send'+txbuf.buffer);
-		for(var i=0;i<(len+5);i++)
+		//console.log('device send'+txbuf.buffer);
+		for(var i=0;i<(len+6);i++)
 		{
 			console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
