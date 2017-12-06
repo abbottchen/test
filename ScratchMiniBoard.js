@@ -93,7 +93,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         'A3': 0
     };
 	
-	var	IRText= "1,2";
+	var	IRText= "111,223";
 	
  	function getSensor(which) {
         return inputs[which];
@@ -266,10 +266,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[3]=0x06;
 		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
 		txbuf[5]=SetDigitIoPortToFrame(VarDigitIoPortLevel);	
-		txbuf[6]=VarAnalogOutPortPeriod['PWM']%256;		//pwm1
-		txbuf[7]=VarAnalogOutPortPeriod['PWM']/256;
-		txbuf[8]=VarAnalogOutPortWidth['PWM']%256;		//pwm1
-		txbuf[9]=VarAnalogOutPortWidth['PWM']/256;
+		txbuf[6]=VarAnalogOutPortPeriod['PWM']/256;		//pwm1
+		txbuf[7]=VarAnalogOutPortPeriod['PWM']%256;
+		txbuf[8]=VarAnalogOutPortWidth['PWM']/256;		//pwm1
+		txbuf[9]=VarAnalogOutPortWidth['PWM']%256;
 		txbuf[10]=CalByteCs(txbuf,10); 	
 		txbuf[11]=0x16;
 		console.log('device send'+txbuf.buffer);
@@ -336,6 +336,11 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			return;
 		
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
+		var	len=strs.length*2;
+		txbuf[0]=0xaa;
+		txbuf[1]=0x84;  
+		txbuf[2]=len/256;
+		txbuf[3]=len%256;
 		for(var i=0;i<strs.length;i++){
 			var tmp=parseInt(strs[i]);
 			txbuf[2*i+4]=tmp/256;
@@ -343,7 +348,15 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			console.log(txbuf[2*i+4]);
 			console.log(txbuf[2*i+5]);
 		}
-		console.log('txbuf:'+txbuf);
+		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
+		txbuf[len+5]=0x16;
+		
+		console.log('device send'+txbuf.buffer);
+		for(var i=0;i<(len+5);i++)
+		{
+			console.log(txbuf[i]);
+			device.send(new Uint8Array([txbuf[i]]).buffer);
+		}
     }
 	ext.IRRemoteTx=function(data){SendIRDataToBoard(data); };
 /**********************************************************************************/
