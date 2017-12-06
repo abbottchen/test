@@ -101,6 +101,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
     }
     ext.sensor = function(width) { return getSensor(which); };	
 	ext.IRRemoteRx=function() {
+	/*
 		if (IRRemoteDataLen>MAX_FRAME_SZ){
 			var Ret= new Uint8Array(0);
 			return Ret;
@@ -111,7 +112,16 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 				Ret[i]=IRRemoteData[i];
 			}
 			return Ret
-		}	
+		}
+	*/
+		var IRData= new Uint8Array(6);
+		IRData[0]=0x30;
+		IRData[1]=0x31;
+		IRData[2]=0x32;
+		IRData[3]=0x33;
+		IRData[4]=0x34;
+		IRData[5]=0x35;
+		return IRData;
 	}
 	
 	//计算一字节的累加和
