@@ -28,9 +28,13 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         device = potentialDevices.shift();
         if (!device) return;
 	
-		console.log('potentialDevices' +potentialDevices);	    
-        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
+		console.log('potentialDevices:' +potentialDevices);
+		var str = JSON.stringify(potentialDevices);
+		console.log('potentialDevices:' +str);
+		var strdevice = JSON.stringify(device);
+		console.log('device:' +strdevice);
 		
+        device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
 		var Buf= new Uint8Array(10);
 		for(var i=0;i<10;i++){
 			Buf[i]=0xaa+i;
