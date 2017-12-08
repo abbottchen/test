@@ -664,9 +664,76 @@ ext.SetYeelink= function(device,sensor,value){
 		},
   	});	
 }
-/******************************************************/	
-ext.resetAll = function(){
+/******************************************************/
+//https://www.tlink.io/index.htm
+var TinkTimeout=12000;		//Tlink的通信超时时间
+var TlinkGetInterval=15000;	//Tlink获取参数的间隔时间
+var TlinkCached = {};
+
+ext.SetTlink= function(device,sensor,value){
+	//15s内不得连续发送请求
+	if(CheckIotTimeInterval('Tlink',YunSetInterval)==false)
+		return
 	
+	var	linkurl='http://localhost:9000/tlink/'+'createDataPonit.htm';
+	var	postdata='{"deviceNo":"'+device+'","sensorDatas":[{"sensorsId":'+sensor+',"value":"'+value+'"}]}';
+	console.log(postdata);
+	$.ajax({ 
+    	url: linkurl,
+    	async: false,
+      	timeout:TinkTimeout,
+     	type: 'post',
+     	data: postdata,
+     	dataType: 'json',
+      	success: function(data) { 
+      		console.log(data.msg);
+      		console.log(data.flag);
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+		},
+  	});	
+}
+
+ext.GetTlink=function (sensor,callback){
+	var	linkurl='http://localhost:9000/tlink/'+'getDataPoint_'+sensor+'.htm'
+
+	if (sensor in TlinkCached){
+		var time=Date.now() - TlinkCached[sensor].time;
+		if(time<TlinkGetInterval){
+			console.log('取缓冲区:'+TlinkCached[sensor].data); 
+			callback(TlinkCached[sensor].data);
+			return;
+		}
+    }
+      	
+	$.ajax({ 
+    	url: linkurl,
+      	timeout:TinkTimeout,
+     	type: 'GET',
+     	dataType: 'json',
+      	success: function(data) { 
+      		if("switcher" in data) {
+      			var tmp=data.switcher;
+      		}
+      		else if("value" in data) {
+      			var tmp=data.value;
+      		}
+      		var ret=parseFloat(tmp);
+      		console.log('取传感器值:'+tmp);
+      		TlinkCached[sensor] = {data: tmp, time: Date.now()};
+      		callback(tmp);
+      		return;
+      	},
+      	error: function(XMLHttpRequest, textStatus){
+			console.log('Error:'+textStatus);
+			callback('error');
+			return;
+		},
+  	});		
+}
+/******************************************************/
+ext.resetAll = function(){
 };
 ext._deviceRemoved = function(dev) {
     if(device != dev) return;
@@ -698,6 +765,8 @@ ext._getStatus = function() {
 	    	[' ', '设置乐为物联设备标识为 %s  传感器标识为 %s 的值为 %n ','SetLewei' ,'01' ,'Humidity','55'],
         	['R', '获取Yeelink设备为 %s  传感器为 %s 的值','GetYeelink','12094' ,'403236'],
 	    	[' ', '设置Yeelink设备为 %s  传感器为 %s 的值为 %n','SetYeelink','12094' ,'403236','11'],
+			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
+	    	[' ', '设置TLINK设备为 %s  传感器为 %s 的值为 %n','SetTlink','576Y1MP1S9722J7V' ,'200111798','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
 			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1160']
 	],
