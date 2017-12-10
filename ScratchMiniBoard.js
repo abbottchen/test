@@ -145,7 +145,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		   
 		tmp=Frame[9]*256+Frame[10];     
 		inputs['A3']= (100 * tmp) / 4096;
-		
+		/*
 		console.log('Frame[4]:'+Frame[4]);
 		console.log('Frame[5]:'+Frame[5]);
 		console.log('Frame[6]:'+Frame[6]);
@@ -155,16 +155,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		console.log(inputs['D4']);
 		console.log(inputs['A1']);
 		console.log(inputs['A2']);
-		console.log(inputs['A3']);
-		
-		/*
-		console.log('inputs['D1']:'+inputs['D1']);
-		console.log('inputs['D2']:'+inputs['D2']);
-		console.log('inputs['D3']:'+inputs['D3']);
-		console.log('inputs['D4']:'+inputs['D4']);
-		console.log('inputs['A1']:'+inputs['A1']);
-		console.log('inputs['A2']:'+inputs['A2']);
-		console.log('inputs['A3']:'+inputs['A3']);*/
+		console.log(inputs['A3']);*/
 		
     }
 	//每次传递一个字节进来，从而得到一个完整帧
@@ -297,7 +288,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[9]=VarAnalogOutPortWidth['PWM']%256;
 		txbuf[10]=CalByteCs(txbuf,10); 	
 		txbuf[11]=0x16;
-		console.log('device send'+txbuf.buffer);
+		//console.log('device send'+txbuf.buffer);
 		for(var i=0;i<12;i++)
 		{
 			console.log(txbuf[i]);
