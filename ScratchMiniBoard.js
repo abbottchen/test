@@ -22,6 +22,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
     }
     var watchdog = null;
 	//调试用，找到一个能打开的串口就可以
+/*
     function tryNextDevice() {
         // If potentialDevices is empty, device will be undefined.
         // That will get us back here next time a device is connected.
@@ -52,8 +53,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        }
     	});
     };	
+	*/
 	
-	/*
     function tryNextDevice() {
         // If potentialDevices is empty, device will be undefined.
         // That will get us back here next time a device is connected.
@@ -67,7 +68,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		    //console.log('Received size' + data.byteLength);	
 	        //放置接收的数据到环形缓冲区
 	        for(var i=0;i<data.byteLength;i++){
-				//console.log(rawData[i]);
+				console.log(rawData[i]);
 				BoardToScrath(rawData[i]);  
 	        }
     	});
@@ -78,7 +79,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        device = null;
 	        tryNextDevice();
 	    }, 500);
-    };	*/
+    };	
 /**********************************************************************************/	
 	
 //以下是对板子到Scratch传递数据的处理	
@@ -758,9 +759,9 @@ ext._deviceRemoved = function(dev) {
 };
 
 ext._getStatus = function() {
-        //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
-        //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
-    return {status: 2, msg: 'ScratchMiniBoard connected'};
+        if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
+        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+    	return {status: 2, msg: 'ScratchMiniBoard connected'};
 }	
 	
 /******************************************************/
