@@ -138,13 +138,13 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		inputs['D4']=(Frame[4]>>3)&0x01;
 
 		var tmp=0;
-		tmp=Frame[3]+(Frame[6]&0x03)*256; 
+		tmp=Frame[3]*256+Frame[4]; 
 		inputs['A1']= (100 * tmp) / 1023;
 		
-		tmp=Frame[4]+((Frame[6]>>2)&0x03)*256;     
+		tmp=Frame[5]*256+Frame[6];     
 		inputs['A2']= (100 * tmp) / 1023;
 		   
-		tmp=Frame[5]+((Frame[6]>>4)&0x03)*256;     
+		tmp=Frame[7]*256+Frame[8];     
 		inputs['A3']= (100 * tmp) / 1023;
     }
 	//每次传递一个字节进来，从而得到一个完整帧
@@ -209,10 +209,11 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 		if(FrameBuf[1]==0x83){
 			GetSensorFromFrame(FrameBuf);
+			console.log('接收到板子发出的传感器');
 		}
 		else if(FrameBuf[1]==0x84){
 			GetIRDataFromFrame(FrameBuf);
-			console.log('红外接收命令');
+			console.log('接收到板子发出红外编码数据');
 		}
 	}
 /**********************************************************************************/	
