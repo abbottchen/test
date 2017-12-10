@@ -150,14 +150,14 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		console.log('Frame[4]:'+Frame[4]);
 		console.log('Frame[5]:'+Frame[5]);
 		console.log('Frame[6]:'+Frame[6]);
-		
+		/*
 		console.log('inputs['D1']:'+inputs['D1']);
 		console.log('inputs['D2']:'+inputs['D2']);
 		console.log('inputs['D3']:'+inputs['D3']);
 		console.log('inputs['D4']:'+inputs['D4']);
 		console.log('inputs['A1']:'+inputs['A1']);
 		console.log('inputs['A2']:'+inputs['A2']);
-		console.log('inputs['A3']:'+inputs['A3']);
+		console.log('inputs['A3']:'+inputs['A3']);*/
 		
     }
 	//每次传递一个字节进来，从而得到一个完整帧
