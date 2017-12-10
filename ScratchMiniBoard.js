@@ -102,7 +102,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
  	function getSensor(which) {
         return inputs[which];
     }
-    ext.sensor = function(width) { return getSensor(which); };	
+    ext.sensor = function(which) { return getSensor(which); };	
 	ext.IRRemoteRx=function() {
 		return IRText;
 	}
