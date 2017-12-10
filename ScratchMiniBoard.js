@@ -265,7 +265,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	function SendControlCmdToUart(){
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
 		txbuf[0]=0xaa;
-		txbuf[1]=0x83;  
+		txbuf[1]=0x01;  
 		txbuf[2]=0x00;
 		txbuf[3]=0x06;
 		txbuf[4]=SetDigitIoPortToFrame(VarDigitIoPortMode);
@@ -342,7 +342,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		var	len=strs.length*2;
 		txbuf[0]=0xaa;
-		txbuf[1]=0x84;  
+		txbuf[1]=0x02;  
 		txbuf[2]=len/256;
 		txbuf[3]=len%256;
 		for(var i=0;i<strs.length;i++){
