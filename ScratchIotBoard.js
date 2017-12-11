@@ -61,7 +61,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
         device = potentialDevices.shift();
         if (!device) return;
 	
-		console.log('potentialDevices' +potentialDevices);	    
+		//console.log('potentialDevices' +potentialDevices);	    
         device.open({ stopBits: 0, bitRate: 57600, parityBit:0, ctsFlowControl: 0 });
         device.set_receive_handler(function(data) {
 		    var rawData = new Uint8Array(data);	
@@ -358,7 +358,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
 		
-		//console.log('device send'+txbuf.buffer);
+		console.log('device send'+txbuf.buffer);
 		for(var i=0;i<(len+6);i++)
 		{
 			//console.log(txbuf[i]);
