@@ -279,10 +279,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[9]=VarAnalogOutPortWidth['PWM']%256;
 		txbuf[10]=CalByteCs(txbuf,10); 	
 		txbuf[11]=0x16;
-		//console.log('device send'+txbuf.buffer);
+		console.log('SendControlCmdToUart:'+txbuf.buffer);
 		for(var i=0;i<12;i++)
 		{
-			console.log(txbuf[i]);
+			//console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}	
     }
@@ -358,7 +358,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
 		
-		console.log('device send'+txbuf.buffer);
+		console.log('SendIRDataToBoard'+txbuf.buffer);
 		for(var i=0;i<(len+6);i++)
 		{
 			//console.log(txbuf[i]);
