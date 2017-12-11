@@ -68,7 +68,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		    //console.log('Received size' + data.byteLength);	
 	        //放置接收的数据到环形缓冲区
 	        for(var i=0;i<data.byteLength;i++){
-				console.log(rawData[i]);
+				//console.log(rawData[i]);
 				BoardToScrath(rawData[i]);  
 	        }
     	});
@@ -78,7 +78,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        device.close();
 	        device = null;
 	        tryNextDevice();
-	    }, 500);
+	    }, 1500);
     };	
 /**********************************************************************************/	
 	
