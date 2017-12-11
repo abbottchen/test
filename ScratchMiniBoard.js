@@ -146,8 +146,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		   
 		tmp=Frame[9]*256+Frame[10];     
 		inputs['A3']= (100 * tmp) / 4096;
-		console.log('D1:'+inputs['D1']+' D2:'+inputs['D2']+' D3:'+inputs['D3']+' D4:'+inputs['D4']);
-		console.log('A1:'+inputs['A1']+' A2:'+inputs['A2']+' A3:'+inputs['A3'];
+		//console.log('D1:'+inputs['D1']+' D2:'+inputs['D2']+' D3:'+inputs['D3']+' D4:'+inputs['D4']);
+		//console.log('A1:'+inputs['A1']+' A2:'+inputs['A2']+' A3:'+inputs['A3'];
     }
 	//每次传递一个字节进来，从而得到一个完整帧
 	function GetFrame(ch) {
