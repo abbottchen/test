@@ -215,7 +215,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		}
 		else if(FrameBuf[1]==0x84){
 			GetIRDataFromFrame(FrameBuf);
-			console.log('接收到板子发出红外编码数据');
+			//console.log('接收到板子发出红外编码数据');
 		}
 	}
 /**********************************************************************************/	
@@ -336,7 +336,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 	//发送红外数据给板子
 	function SendIRDataToBoard(text){ 
-		console.log(text);
+		//console.log(text);
 		var	strs=new Array();
 		strs=text.split(",");
 		if(strs.length>(MAX_FRAME_SZ/2))
@@ -361,7 +361,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		//console.log('device send'+txbuf.buffer);
 		for(var i=0;i<(len+6);i++)
 		{
-			console.log(txbuf[i]);
+			//console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}
     }
