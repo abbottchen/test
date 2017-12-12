@@ -146,8 +146,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		   
 		tmp=Frame[9]*256+Frame[10];     
 		inputs['A3']= (100 * tmp) / 4096;
-		//var str="D1:";
-		//str=str+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4'];
 		console.log("D1:"+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4']);
 		console.log("A1:"+inputs['A1']+" A2:"+inputs['A2']+" A3:"+inputs['A3']);
     }
@@ -265,7 +263,69 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		if(prm['IR'])
 			tmp=tmp|(1<<7);
 		 return tmp;
-  	}	
+  	}
+	
+	function DebugControlCmd(){
+		var str="";
+		if(VarDigitIoPortMode['D1']==1)
+			str=str+"D1:Out";
+		else
+			str=str+"D1:In";
+		
+		if(VarDigitIoPortMode['D2']==1)
+			str=str+"D2:Out";
+		else
+			str=str+"D2:In";	
+		
+		if(VarDigitIoPortMode['D3']==1)
+			str=str+"D3:Out";
+		else
+			str=str+"D3:In";
+	
+		if(VarDigitIoPortMode['D4']==1)
+			str=str+"D4:Out";
+		else
+			str=str+"D4:In";		
+		
+		if(VarDigitIoPortMode['IR']==1)
+			str=str+"IR:Out";
+		else
+			str=str+"IR:In";
+		
+		console.log("工作模式-"+str);
+		
+		str="";
+		if(VarDigitIoPortLevel['D1']==1)
+			str=str+"D1:H";
+		else
+			str=str+"D1:L";
+		
+		if(VarDigitIoPortLevel['D2']==1)
+			str=str+"D2:H";
+		else
+			str=str+"D2:L";	
+		
+		if(VarDigitIoPortLevel['D3']==1)
+			str=str+"D3:H";
+		else
+			str=str+"D3:L";
+	
+		if(VarDigitIoPortLevel['D4']==1)
+			str=str+"D4:H";
+		else
+			str=str+"D4:L";	
+		
+		if(VarDigitIoPortLevel['D5']==1)
+			str=str+"D5:H";
+		else
+			str=str+"D5:L";	
+		console.log("输出电平-"+str);
+		
+		str="";
+		str=str+"周期:"+VarAnalogOutPortPeriod['PWM']+"us"+"脉宽:"+VarAnalogOutPortWidth['PWM']+"us";
+		console.log("PWM-"+str);
+	}
+	
 	//控制命令的应用层格式
    	function SendControlCmdToUart(){
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);	
@@ -286,7 +346,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		{
 			//console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
-		}	
+		}
+		DebugControlCmd();
     }
     //设置工作模式和IO口电平
     function SetBoardMode(which,mode,condition,buf) {
