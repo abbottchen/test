@@ -342,8 +342,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		if(strs.length>(MAX_FRAME_SZ/2))
 			return;
 		
+		console.log("长度"+strs.length);
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		var	len=strs.length*2;
+		console.log("长度"+len);
 		txbuf[0]=0xaa;
 		txbuf[1]=0x02;  
 		txbuf[2]=len/256;
@@ -352,8 +354,6 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			var tmp=parseInt(strs[i]);
 			txbuf[2*i+4]=tmp/256;
 			txbuf[2*i+5]=tmp%256;
-			//console.log(txbuf[2*i+4]);
-			//console.log(txbuf[2*i+5]);
 		}
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
