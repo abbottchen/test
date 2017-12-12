@@ -146,8 +146,10 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		   
 		tmp=Frame[9]*256+Frame[10];     
 		inputs['A3']= (100 * tmp) / 4096;
-		//console.log('D1:'+inputs['D1']+' D2:'+inputs['D2']+' D3:'+inputs['D3']+' D4:'+inputs['D4']);
-		//console.log('A1:'+inputs['A1']+' A2:'+inputs['A2']+' A3:'+inputs['A3'];
+		//var str="D1:";
+		//str=str+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4'];
+		console.log("D1:"+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4']);
+		console.log("A1:"+inputs['A1']+" A2:"+inputs['A2']+" A3:"+inputs['A3'];
     }
 	//每次传递一个字节进来，从而得到一个完整帧
 	function GetFrame(ch) {
@@ -279,7 +281,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[9]=VarAnalogOutPortWidth['PWM']%256;
 		txbuf[10]=CalByteCs(txbuf,10); 	
 		txbuf[11]=0x16;
-		console.log('SendControlCmdToUart:'+txbuf.buffer);
+		//console.log('SendControlCmdToUart:'+txbuf.buffer);
 		for(var i=0;i<12;i++)
 		{
 			//console.log(txbuf[i]);
@@ -336,16 +338,16 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	
 	//发送红外数据给板子
 	function SendIRDataToBoard(text){ 
-		console.log(text);
+		//console.log(text);
 		var	strs=new Array();
 		strs=text.split(",");
 		if(strs.length>(MAX_FRAME_SZ/2))
 			return;
 		
-		console.log("长度"+strs.length);
+		//console.log("长度"+strs.length);
 		var txbuf = new Uint8Array(MAX_FRAME_SZ);
 		var	len=strs.length*2;
-		console.log("长度"+len);
+		//console.log("长度"+len);
 		txbuf[0]=0xaa;
 		txbuf[1]=0x02;  
 		txbuf[2]=len/256;
@@ -358,7 +360,7 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
 		
-		console.log('SendIRDataToBoard'+txbuf.buffer);
+		//console.log('SendIRDataToBoard'+txbuf.buffer);
 		for(var i=0;i<(len+6);i++)
 		{
 			//console.log(txbuf[i]);
