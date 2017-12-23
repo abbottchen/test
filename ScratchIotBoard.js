@@ -347,6 +347,16 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			//console.log(txbuf[i]);
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}
+		//延迟20ms之后，再发送一包数据
+		for(var i=0;i<100;i++)
+		{
+			device.send('b');
+		}
+		
+		for(var i=0;i<12;i++)
+		{
+			device.send(new Uint8Array([txbuf[i]]).buffer);
+		}
 		DebugControlCmd();
     }
     //设置工作模式和IO口电平
