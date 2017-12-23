@@ -157,8 +157,8 @@ function delayms(ms) {
 		   
 		tmp=Frame[9]*256+Frame[10];     
 		inputs['A3']= (100 * tmp) / 4096;
-		console.log("D1:"+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4']);
-		console.log("A1:"+inputs['A1']+" A2:"+inputs['A2']+" A3:"+inputs['A3']);
+		console.log("D1:"+inputs['D1']+" D2:"+inputs['D2']+" D3:"+inputs['D3']+" D4:"+inputs['D4']+"A1:"+inputs['A1']+" A2:"+inputs['A2']+" A3:"+inputs['A3']);
+		//console.log();
     }
 	//每次传递一个字节进来，从而得到一个完整帧
 	function GetFrame(ch) {
@@ -277,7 +277,7 @@ function delayms(ms) {
   	}
 	
 	function DebugControlCmd(){
-		var str="";
+		var str="工作模式-";
 		if(VarDigitIoPortMode['D1']==1)
 			str=str+"D1:Out";
 		else
@@ -303,9 +303,7 @@ function delayms(ms) {
 		else
 			str=str+"IR:In";
 		
-		console.log("工作模式-"+str);
-		
-		str="";
+		str=str+" 输出电平";
 		if(VarDigitIoPortLevel['D1']==1)
 			str=str+"D1:H";
 		else
@@ -330,11 +328,10 @@ function delayms(ms) {
 			str=str+"D5:H";
 		else
 			str=str+"D5:L";	
-		console.log("输出电平-"+str);
 		
-		str="";
+		str=str+" PWM-";
 		str=str+"周期:"+VarAnalogOutPortPeriod['PWM']+"us"+"脉宽:"+VarAnalogOutPortWidth['PWM']+"us";
-		console.log("PWM-"+str);
+		console.log(str);
 	}
 	
 	//控制命令的应用层格式
@@ -729,7 +726,7 @@ ext._getStatus = function() {
 			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
 	    	[' ', '设置TLINK设备为 %s  传感器为 %s 的值为 %n','SetTlink','576Y1MP1S9722J7V' ,'200111798','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,2345']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1111']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
