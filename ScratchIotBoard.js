@@ -407,6 +407,20 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
 	
+	function SetDefaultToBoard(){
+		VarDigitIoPortMode['D1']=0;
+		VarDigitIoPortMode['D2']=0;
+		VarDigitIoPortMode['D3']=0;
+		VarDigitIoPortMode['D4']=0;
+		VarDigitIoPortMode['IR']=0;
+		VarDigitIoPortLevel['D1']=0;
+		VarDigitIoPortLevel['D2']=0;
+		VarDigitIoPortLevel['D3']=0;
+		VarDigitIoPortLevel['D4']=0;
+		VarDigitIoPortLevel['D5']=0;
+		SendControlCmdToUart();
+	}
+	
 	//发送红外数据给板子
 	function SendIRDataToBoard(text){ 
 		//console.log(text);
@@ -665,6 +679,7 @@ ext.GetTlink=function (sensor,callback){
 }
 /******************************************************/
 ext.resetAll = function(){
+	SetDefaultToBoard();
 };
 ext._deviceRemoved = function(dev) {
     if(device != dev) return;
@@ -695,7 +710,7 @@ ext._getStatus = function() {
 			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
 	    	[' ', '设置TLINK设备为 %s  传感器为 %s 的值为 %n','SetTlink','576Y1MP1S9722J7V' ,'200111798','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1160']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1234']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
