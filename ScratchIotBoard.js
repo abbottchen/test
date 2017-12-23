@@ -348,9 +348,11 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 			device.send(new Uint8Array([txbuf[i]]).buffer);
 		}
 		//延迟20ms之后，再发送一包数据
-		for(var i=0;i<100;i++)
+		var delaybuf = new Uint8Array(1);
+		delaybuf[0]=1;
+		for(var i=0;i<120;i++)
 		{
-			device.send('b');
+			device.send(new Uint8Array([delaybuf[1]]).buffer);
 		}
 		
 		for(var i=0;i<12;i++)
@@ -710,7 +712,7 @@ ext._getStatus = function() {
 			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
 	    	[' ', '设置TLINK设备为 %s  传感器为 %s 的值为 %n','SetTlink','576Y1MP1S9722J7V' ,'200111798','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,1234']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,5678']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
