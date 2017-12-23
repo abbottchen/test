@@ -417,7 +417,7 @@ function delayms(ms) {
 		Period=(1000000/Period);
 		Period=Math.round(Period);
 		VarAnalogOutPortPeriod['PWM']=Period;
-		Width=Width/2;
+		Width=Period/2;
 		Width=Math.round(Width);
 		VarAnalogOutPortWidth['PWM']=Width;
 		SendControlCmdToUart();		
@@ -435,6 +435,8 @@ function delayms(ms) {
 		VarDigitIoPortLevel['D3']=0;
 		VarDigitIoPortLevel['D4']=0;
 		VarDigitIoPortLevel['D5']=0;
+		VarAnalogOutPortPeriod['PWM']=0;
+		VarAnalogOutPortWidth['PWM']=0;
 		SendControlCmdToUart();
 	}
 	
