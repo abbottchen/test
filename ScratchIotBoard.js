@@ -358,20 +358,6 @@ function delayms(ms) {
 			}
 			delayms(20);
 		}
-		/*
-		//延迟20ms之后，再发送一包数据
-		var delaybuf = new Uint8Array(1);
-		delaybuf[0]=1;
-		for(var i=0;i<120;i++)
-		{
-			device.send(new Uint8Array([delaybuf[1]]).buffer);
-		}
-		
-		for(var i=0;i<12;i++)
-		{
-			device.send(new Uint8Array([txbuf[i]]).buffer);
-		}*/
-		
     }
     //设置工作模式和IO口电平
     function SetBoardMode(which,mode,condition,buf) {
@@ -422,11 +408,12 @@ function delayms(ms) {
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
 	
 	function SetDefaultToBoard(){
-		VarDigitIoPortMode['D1']=0;
-		VarDigitIoPortMode['D2']=0;
-		VarDigitIoPortMode['D3']=0;
-		VarDigitIoPortMode['D4']=0;
-		VarDigitIoPortMode['IR']=0;
+		//默认状态为输出模式，且输出电平为低
+		VarDigitIoPortMode['D1']=1;
+		VarDigitIoPortMode['D2']=1;
+		VarDigitIoPortMode['D3']=1;
+		VarDigitIoPortMode['D4']=1;
+		VarDigitIoPortMode['IR']=1;
 		VarDigitIoPortLevel['D1']=0;
 		VarDigitIoPortLevel['D2']=0;
 		VarDigitIoPortLevel['D3']=0;
