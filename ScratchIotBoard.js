@@ -80,7 +80,18 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 	        tryNextDevice();
 	    }, 1500);
     };	
-/**********************************************************************************/	
+/**********************************************************************************/
+//延时函数
+function delayms(ms) {	
+	var	lasttime=Date.now();
+	var time=0;
+	while(1){
+		time=Date.now() -lasttime;
+		if(time>=ms)
+			return;
+	}
+}
+	
 	
 //以下是对板子到Scratch传递数据的处理	
 	var	MAX_FRAME_SZ=500;
@@ -342,11 +353,15 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[10]=CalByteCs(txbuf,10); 	
 		txbuf[11]=0x16;
 		//console.log('SendControlCmdToUart:'+txbuf.buffer);
-		for(var i=0;i<12;i++)
-		{
-			//console.log(txbuf[i]);
-			device.send(new Uint8Array([txbuf[i]]).buffer);
+		DebugControlCmd();
+		for(var retry=0;retry<2;retry++){
+			for(var i=0;i<12;i++)
+			{
+				device.send(new Uint8Array([txbuf[i]]).buffer);
+			}
+			delayms(20);
 		}
+		/*
 		//延迟20ms之后，再发送一包数据
 		var delaybuf = new Uint8Array(1);
 		delaybuf[0]=1;
@@ -358,8 +373,8 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		for(var i=0;i<12;i++)
 		{
 			device.send(new Uint8Array([txbuf[i]]).buffer);
-		}
-		DebugControlCmd();
+		}*/
+		
     }
     //设置工作模式和IO口电平
     function SetBoardMode(which,mode,condition,buf) {
@@ -447,12 +462,14 @@ var ReadEnvicloudInterval=3000000;//50分钟读取一次
 		txbuf[len+4]=CalByteCs(txbuf,(len+4)); 	
 		txbuf[len+5]=0x16;
 		
-		//console.log('SendIRDataToBoard'+txbuf.buffer);
-		for(var i=0;i<(len+6);i++)
-		{
-			//console.log(txbuf[i]);
-			device.send(new Uint8Array([txbuf[i]]).buffer);
+		//重发一次防止第1包没收到
+		for(var retry=0;retry<2;retry++){
+			for(var i=0;i<(len+6);i++)
+			{
+				device.send(new Uint8Array([txbuf[i]]).buffer);
+			}
 		}
+		delayms(300);//两次发送之间不能太快
     }
 	ext.IRRemoteTx=function(data){SendIRDataToBoard(data); };
 /**********************************************************************************/
@@ -712,7 +729,7 @@ ext._getStatus = function() {
 			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
 	    	[' ', '设置TLINK设备为 %s  传感器为 %s 的值为 %n','SetTlink','576Y1MP1S9722J7V' ,'200111798','11'],
 			['r', '接收红外遥控编码', 'IRRemoteRx'],
-			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,5678']
+			[' ', '发送红外遥控编码 %s', 'IRRemoteTx','513,1000,1513,2345']
 	],
         menus: {
 			AllInPort:['D1','D2','D3','D4','A1','A2','A3'],
