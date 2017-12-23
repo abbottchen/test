@@ -279,55 +279,55 @@ function delayms(ms) {
 	function DebugControlCmd(){
 		var str="工作模式-";
 		if(VarDigitIoPortMode['D1']==1)
-			str=str+"D1:Out";
+			str=str+"D1:O";
 		else
-			str=str+"D1:In";
+			str=str+"D1:I";
 		
 		if(VarDigitIoPortMode['D2']==1)
-			str=str+"D2:Out";
+			str=str+" D2:O";
 		else
-			str=str+"D2:In";	
+			str=str+" D2:I";	
 		
 		if(VarDigitIoPortMode['D3']==1)
-			str=str+"D3:Out";
+			str=str+" D3:O";
 		else
-			str=str+"D3:In";
+			str=str+" D3:I";
 	
 		if(VarDigitIoPortMode['D4']==1)
-			str=str+"D4:Out";
+			str=str+" D4:O";
 		else
-			str=str+"D4:In";		
+			str=str+" D4:I";		
 		
 		if(VarDigitIoPortMode['IR']==1)
-			str=str+"IR:Out";
+			str=str+" IR:O";
 		else
-			str=str+"IR:In";
+			str=str+" IR:I";
 		
-		str=str+" 输出电平";
+		str=str+" 输出电平-";
 		if(VarDigitIoPortLevel['D1']==1)
 			str=str+"D1:H";
 		else
 			str=str+"D1:L";
 		
 		if(VarDigitIoPortLevel['D2']==1)
-			str=str+"D2:H";
+			str=str+" D2:H";
 		else
-			str=str+"D2:L";	
+			str=str+" D2:L";	
 		
 		if(VarDigitIoPortLevel['D3']==1)
-			str=str+"D3:H";
+			str=str+" D3:H";
 		else
-			str=str+"D3:L";
+			str=str+" D3:L";
 	
 		if(VarDigitIoPortLevel['D4']==1)
-			str=str+"D4:H";
+			str=str+" D4:H";
 		else
-			str=str+"D4:L";	
+			str=str+" D4:L";	
 		
 		if(VarDigitIoPortLevel['D5']==1)
-			str=str+"D5:H";
+			str=str+" D5:H";
 		else
-			str=str+"D5:L";	
+			str=str+" D5:L";	
 		
 		str=str+" PWM-";
 		str=str+"周期:"+VarAnalogOutPortPeriod['PWM']+"us"+"脉宽:"+VarAnalogOutPortWidth['PWM']+"us";
