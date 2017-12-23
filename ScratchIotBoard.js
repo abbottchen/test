@@ -410,9 +410,9 @@ function delayms(ms) {
 	//设置输出频率
 	ext.SetFrq=function(Hz){
 		var	Period=Hz,Width=0;
-		//最高不能超过200kHz
-		if(Period>200000)
-			Period=200000;
+		//最高不能超过100kHz
+		if(Period>100000)
+			Period=100000;
 		
 		Period=(1000000/Period);
 		Period=Math.round(Period);
