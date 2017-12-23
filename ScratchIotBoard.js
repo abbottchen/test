@@ -407,6 +407,22 @@ function delayms(ms) {
    	};	
 	ext.SetServo=function(angle,ch) { return SetServoToPram(angle,ch); };
 	
+	//设置输出频率
+	ext.SetFrq=function(Hz){
+		var	Period=Hz,Width=0;
+		//最高不能超过200kHz
+		if(Period>200000)
+			Period=200000;
+		
+		Period=(1000000/Period);
+		Period=Math.round(Period);
+		VarAnalogOutPortPeriod['PWM']=Period;
+		Width=Width/2;
+		Width=Math.round(Width);
+		VarAnalogOutPortWidth['PWM']=Width;
+		SendControlCmdToUart();		
+	}
+	
 	function SetDefaultToBoard(){
 		//默认状态为输出模式，且输出电平为低
 		VarDigitIoPortMode['D1']=1;
@@ -706,8 +722,9 @@ ext._getStatus = function() {
         	[' ', '设置数字 %m.DigitalInOutPort 脚为 %m.DigitalIOmode', 'SetDigitPortMode', 'D1', '输入'],
             [' ', '输出 %m.DigitalIOOutType 电平到 数字 %m.DigitalOutPort 脚', 'SetDigitPortLevel', '低', 'D1'],
             ['r', ' %m.AllInPort 脚的输入值', 'sensor', 'D1'],
-            [' ', '输出周期为 %n ms 占空比为 %n (0~100%)的信号到 %m.AnalogOutPortName 脚', 'SetPWMPram', 40 , 50 ,'PWM'],
+			[' ', '输出 %n Hz信号到 %m.AnalogOutPortName 脚', 'SetFrq', 200 ,'PWM'],
 	    	[' ', '输出 %n (0~180)角度到模拟输出脚 %m.AnalogOutPortName (舵机)', 'SetServo', 90 ,'PWM'],
+			[' ', '输出周期为 %n ms 占空比为 %n (0~100%)的信号到 %m.AnalogOutPortName 脚', 'SetPWMPram', 40 , 50 ,'PWM'],
 	    	['R', '城市:%s 的 %m.WeatherDataType 值 ', 'GetEnvicloudWeather', '北京', '温度'],
 	    	['R', '城市:%s 的 %m.AirDataType 值 ', 'GetEnvicloudAir', '北京', 'PM2.5'],	
 			['R', '获取TLINK传感器为 %s 的值','GetTlink','200111797'],
