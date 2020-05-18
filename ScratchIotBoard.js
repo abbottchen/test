@@ -488,7 +488,6 @@ function fetchEnvicloudCitycode(city,callback){
     	url: Envicloudurl,
       	timeout:EnvicloudTimeout,
      	type: 'GET',
-	contentType: "application/json;charset=utf-8"
      	dataType: 'json',
       	success: function(data) { 
       		console.log('获取城市代码:'+data.citycode);
@@ -517,8 +516,7 @@ function fetchEnvicloudWeather(city,callback){
     		url: url,
       		timeout:EnvicloudTimeout,
      		type: 'GET',
-     		dataType: 'json',
-		contentType: "application/json;charset=utf-8"	
+     		dataType: 'json',	
       		success: function(weatherData) { 
 			console.log('获取气候数据:'+weatherData); 
       			EnvicloudWeatherCached[city] = {data: weatherData, time: Date.now()};
@@ -582,8 +580,7 @@ function fetchEnvicloudAir(city,callback){
     		url: url,
       		timeout:EnvicloudTimeout,
      		type: 'GET',
-     		dataType: 'json',
-		contentType: "application/json;charset=utf-8"	
+     		dataType: 'json',	
       		success: function(airData) { 
 			console.log('取云服务器空气质量:'+airData); 
       			EnvicloudAirCached[city] = {data: airData, time: Date.now()};
