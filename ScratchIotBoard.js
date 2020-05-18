@@ -716,8 +716,8 @@ ext._deviceRemoved = function(dev) {
 };
 
 ext._getStatus = function() {
-        if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
-        if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
+        //if(!device) return {status: 1, msg: 'ScratchMiniBoard disconnected'};
+        //if(watchdog) return {status: 1, msg: 'Probing for ScratchMiniBoard'};
     	return {status: 2, msg: 'ScratchMiniBoard connected'};
 }	
 	
