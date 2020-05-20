@@ -662,7 +662,7 @@ ext.SetTlink= function(device,sensor,value){
 }
 
 ext.GetTlink=function (sensor,callback){
-	var	linkurl='http://localhost:9000/tlink/'+'getDataPoint_'+sensor+'.htm'
+	var	linkurl='http://api.tlink.io/tlink_interface/api/device/getDataPoint_'+sensor+'.htm'
 
 	if (sensor in TlinkCached){
 		var time=Date.now() - TlinkCached[sensor].time;
